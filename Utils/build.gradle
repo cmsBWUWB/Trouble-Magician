@@ -5,6 +5,7 @@ android {
     compileSdkVersion project.COMPILE_SDK_VERSION as int
 
 
+
     defaultConfig {
         minSdkVersion project.MIN_SDK_VERSION as int
         targetSdkVersion project.TARGET_SDK_VERSION as int
@@ -15,20 +16,17 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    useLibrary 'org.apache.http.legacy'
 
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'com.hyphenate:hyphenate-sdk-lite:3.3.0'
-
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    api files('libs/klog.jar')
 }
 repositories {
     mavenCentral()
