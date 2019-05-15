@@ -9,9 +9,6 @@ android {
         targetSdkVersion project.TARGET_SDK_VERSION as int
         versionCode project.APP_VERSION_CODE as int
         versionName "$APP_VERSION_NAME"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -30,7 +27,4 @@ dependencies {
     implementation 'com.hyphenate:hyphenate-sdk-lite:3.3.0'
 
     implementation "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
