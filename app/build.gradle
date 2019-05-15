@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion project.COMPILE_SDK_VERSION as int
     defaultConfig {
         applicationId "com.hfut.trouble"
-        minSdkVersion 19
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion project.MIN_SDK_VERSION as int
+        targetSdkVersion project.TARGET_SDK_VERSION as int
+        versionCode project.APP_VERSION_CODE as int
+        versionName "$APP_VERSION_NAME"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -20,7 +20,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
     testImplementation 'junit:junit:4.12'
