@@ -26,6 +26,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'com.hyphenate:hyphenate-sdk-lite:3.3.0'
+    implementation 'org.greenrobot:eventbus:3.1.1'
 
     implementation "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"

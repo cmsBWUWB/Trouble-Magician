@@ -41,13 +41,13 @@ class ThreadDispatcher private constructor() {
 
     inner class UIBusinessPriorityQueue : PriorityBlockingQueue<Runnable>() {
         override fun poll(timeout: Long, unit: TimeUnit?): Runnable? {
-            val first = peek() as BusinessRunnable
+            val first = peek() as BusinessRunnable?
             return if (shouldExecute(first)) super.poll(timeout, unit) else null
         }
     }
 
-    private fun shouldExecute(runnable: BusinessRunnable): Boolean {
-        return BusinessPriority.UI === runnable.getPriority() || MAXIMUM_POOL_SIZE - threadPoolExecutor.activeCount > HOLD_THREAD_COUNT
+    private fun shouldExecute(runnable: BusinessRunnable?): Boolean {
+        return runnable != null && BusinessPriority.UI === runnable.getPriority() || MAXIMUM_POOL_SIZE - threadPoolExecutor.activeCount > HOLD_THREAD_COUNT
     }
 
     fun postToMainThread(run: Runnable?): Boolean {
@@ -66,4 +66,8 @@ class ThreadDispatcher private constructor() {
         return mainThreadHandler.postDelayed(runnable, delay)
     }
 
+    fun postToBusinessThread(run: BusinessRunnable): Boolean {
+        threadPoolExecutor.execute(run)
+        return true
+    }
 }

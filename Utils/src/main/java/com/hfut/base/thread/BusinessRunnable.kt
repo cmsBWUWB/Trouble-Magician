@@ -18,6 +18,8 @@ abstract class BusinessRunnable : Runnable, Comparable<BusinessRunnable>{
         return mPriority.value() - other.mPriority.value()
     }
 
+    constructor()
+
     constructor(businessPriority : BusinessPriority){
         mPriority = businessPriority
     }
