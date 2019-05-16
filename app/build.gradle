@@ -34,6 +34,7 @@ dependencies {
 //    butterknife相关配置，为避免与appcompat-v7冲突，这里使用butterknife8.0。
     implementation 'com.jakewharton:butterknife:8.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.0.0'
+    implementation project(path: ':gamelibrary')
 
 }
 repositories {

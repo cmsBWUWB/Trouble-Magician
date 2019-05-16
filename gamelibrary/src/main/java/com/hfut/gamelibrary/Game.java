@@ -12,7 +12,7 @@ public class Game {
         Queue<Card> cardQueue;//手里的牌
     }
 
-    Queue<Card> cardQueue;//剩余可选的卡牌
+    private Queue<Card> cardQueue;//剩余可选的卡牌
     private List<Player> playerList;//所有玩家
     private Player currentPlayer;//当前施放魔法的玩家
 
@@ -21,7 +21,6 @@ public class Game {
      * 初始化
      */
     public void init(List<String> userName){
-
     }
     public String getNextOne(){
         int nextIndex = (playerList.indexOf(currentPlayer) + 1) % playerList.size();

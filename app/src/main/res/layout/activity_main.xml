@@ -7,27 +7,14 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/et_username"
-        android:hint="@string/hint_username"
-        android:maxLength="15"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <EditText
-        android:hint="@string/hint_password"
-        android:id="@+id/et_password"
-        android:inputType="textPassword"
-        android:maxLength="20"
+    <Button
+        android:id="@+id/bt_create_room"
+        android:text="创建房间"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
-        android:id="@+id/bt_register"
-        android:text="注册"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/bt_login"
-        android:text="登录"
+        android:id="@+id/bt_dismiss_room"
+        android:text="解散房间"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

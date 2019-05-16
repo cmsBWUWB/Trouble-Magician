@@ -8,6 +8,7 @@ import android.widget.EditText;
 import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.ButterKnife;
 
 /**
@@ -18,21 +19,19 @@ import butterknife.ButterKnife;
  */
 
 public class MainActivity extends AppCompatActivity {
-    @BindView(R.id.et_username)
-    public EditText etUsername;
-    @BindView(R.id.et_password)
-    public EditText etPassword;
-    @BindView(R.id.bt_register)
-    public Button btRegister;
-    @BindView(R.id.bt_login)
-    public Button btLogin;
+    @BindViews({R.id.bt_create_room, R.id.bt_dismiss_room})
+    public Button btCreate;
+    public Button btDismiss;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
         EventBus.getDefault().register(this);
+
+
 
         setListener();
     }
