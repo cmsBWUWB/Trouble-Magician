@@ -21,6 +21,10 @@ allprojects {
     }
 }
 
+ext {
+    projectLibs = rootDir.absolutePath + "$PROJECT_LIBS"
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

@@ -24,16 +24,12 @@ android {
 }
 
 dependencies {
+    implementation project(':imlibrary')
+    implementation project(':Utils')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation project(':imlibrary')
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    api project(':Utils')
-
     implementation 'org.greenrobot:eventbus:3.1.1'
-
 //    butterknife相关配置，为避免与appcompat-v7冲突，这里使用butterknife8.0。
     implementation 'com.jakewharton:butterknife:8.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.0.0'
