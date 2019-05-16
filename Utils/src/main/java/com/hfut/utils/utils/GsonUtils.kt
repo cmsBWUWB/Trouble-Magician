@@ -1,4 +1,4 @@
-package com.hfut.base.utils
+package com.hfut.utils.utils
 
 import android.text.TextUtils
 import com.google.gson.Gson

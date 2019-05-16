@@ -1,6 +1,6 @@
-package com.hfut.base.model
+package com.hfut.utils.model
 
-import com.hfut.base.utils.GsonUtils
+import com.hfut.utils.utils.GsonUtils
 
 /**
  * Created by wzt on 2019/5/16

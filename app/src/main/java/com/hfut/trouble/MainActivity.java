@@ -7,8 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.hfut.base.thread.BusinessRunnable;
-import com.hfut.base.thread.ThreadDispatcher;
+import com.hfut.utils.thread.BusinessRunnable;
+import com.hfut.utils.thread.ThreadDispatcher;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.event.LoginEvent;
 import com.hfut.imlibrary.event.RegisterEvent;

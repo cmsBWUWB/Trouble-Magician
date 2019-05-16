@@ -1,4 +1,4 @@
-package com.hfut.base.thread
+package com.hfut.utils.thread
 
 import android.os.Looper
 import android.os.Process

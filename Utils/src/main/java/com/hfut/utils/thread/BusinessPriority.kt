@@ -1,4 +1,4 @@
-package com.hfut.base.thread
+package com.hfut.utils.thread
 
 import android.os.Process.THREAD_PRIORITY_BACKGROUND
 import android.os.Process.THREAD_PRIORITY_DEFAULT
