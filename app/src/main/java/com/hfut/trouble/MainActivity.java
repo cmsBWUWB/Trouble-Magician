@@ -9,7 +9,9 @@ import android.widget.Toast;
 
 import com.hfut.base.thread.BusinessRunnable;
 import com.hfut.base.thread.ThreadDispatcher;
-import com.hfut.imlibrary.IMUtils;
+import com.hfut.imlibrary.IMManager;
+import com.hfut.imlibrary.event.LoginEvent;
+import com.hfut.imlibrary.event.RegisterEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
                     @Override
                     public void doWorkInRun() {
-                        IMUtils.getInstance().register(username, password);
+                        IMManager.getInstance().register(username, password);
                     }
                 });
             }
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
                     @Override
                     public void doWorkInRun() {
-                        IMUtils.getInstance().login(username, password);
+                        IMManager.getInstance().login(username, password);
                     }
                 });
             }
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
-    public void onRegisterEvent(IMUtils.RegisterEvent event) {
+    public void onRegisterEvent(RegisterEvent event) {
         if (event.isSuccess()) {
             Toast.makeText(this, "注册成功！", Toast.LENGTH_SHORT).show();
         } else {
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
-    public void onLoginEvent(IMUtils.LoginEvent event) {
+    public void onLoginEvent(LoginEvent event) {
         if (event.isSuccess()) {
             Toast.makeText(this, "登录成功！", Toast.LENGTH_SHORT).show();
         } else {
