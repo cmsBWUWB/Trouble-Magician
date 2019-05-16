@@ -1,24 +1,21 @@
 package com.hfut.trouble;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import com.hfut.utils.thread.BusinessRunnable;
-import com.hfut.utils.thread.ThreadDispatcher;
-import com.hfut.imlibrary.IMManager;
-import com.hfut.imlibrary.event.LoginEvent;
-import com.hfut.imlibrary.event.RegisterEvent;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+/**
+ * 业务规则如下：
+ * 1. 每个人最多同时只能加入一个游戏，要想开始新的游戏，必须退出当前游戏。
+ * 2. 每个人最开始可以为自己设置一个昵称，且不用关心密码等操作。启动则自动登录。
+ * 3. 不可修改昵称（因为昵称需要自己建立服务器）
+ */
 
 public class MainActivity extends AppCompatActivity {
     @BindView(R.id.et_username)
@@ -47,50 +44,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListener() {
-        btRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String username = etUsername.getText().toString();
-                String password = etPassword.getText().toString();
-                ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
-                    @Override
-                    public void doWorkInRun() {
-                        IMManager.getInstance().register(username, password);
-                    }
-                });
-            }
-        });
-        btLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String username = etUsername.getText().toString();
-                String password = etPassword.getText().toString();
-                ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
-                    @Override
-                    public void doWorkInRun() {
-                        IMManager.getInstance().login(username, password);
-                    }
-                });
-            }
-        });
-    }
 
-    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
-    public void onRegisterEvent(RegisterEvent event) {
-        if (event.isSuccess()) {
-            Toast.makeText(this, "注册成功！", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "注册失败！", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
-    public void onLoginEvent(LoginEvent event) {
-        if (event.isSuccess()) {
-            Toast.makeText(this, "登录成功！", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "登录失败！", Toast.LENGTH_SHORT).show();
-        }
     }
 
 
