@@ -1,27 +1,30 @@
 package com.hfut.gamelibrary;
 
+import android.text.TextUtils;
+
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
-import com.hfut.imlibrary.event.MessageReceivedEvent;
 import com.hfut.imlibrary.model.Group;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
 /**
+ * 游戏房间以一个特殊的群组存在，有特定且唯一的群名决定
+ *
  * 游戏步骤如下：
- * 1. 创建房间--创建一个群组
- * 2. 加入房间--加入一个群组
- * 3. 开始游戏--在群组里面发送一个开始消息，只有创建者才能开始游戏和终止游戏
- * 4. 终止游戏--在群组里面发送一个终止消息
+ * 1. 创建房间--创建游戏群组
+ * 2. 加入房间--加入游戏群组
+ * 3. 开始游戏--在游戏群组里面发送一个开始消息，只有创建者才能开始游戏和终止游戏
+ * 4. 终止游戏--在游戏群组里面发送一个终止消息
  * 5. 重新开始--终止游戏 + 开始游戏
- * 6. 解散房间--销毁群组
- * 7. 退出房间--退出群组
+ * 6. 解散房间--销毁游戏群组
+ * 7. 退出房间--退出游戏群组
+ *
+ * @author cms
  *
  */
 public class GameManager {
+    public static final String GAME_GROUP_NAME = "unique trouble magician game";
     private static GameManager instance = new GameManager();
     private GameManager(){
     }
@@ -29,93 +32,87 @@ public class GameManager {
         return instance;
     }
 
-    private enum NextAction{NEXT_ONE, NEXT_TURN, END_GAME}
-    private static final String START_GAME = "start game!!!!!!!!";
-
-    private String currentUsername;
-    private List<Group> groupList;
-
-    private Group currentGroup;
+    private IMManager imManager;
+    private Group currentRoom;
     private Game currentGame;
 
     /**
      * 初始化
-     * @param userName
-     * @param androidId
      */
-    public void initGameManager(String userName, String androidId, final OperateCallBack callBack){
-        IMManager.getInstance().register(userName, androidId);
-        IMManager.getInstance().login(userName, androidId, callBack);
-        currentUsername = userName;
+    public void initGameManager(){
+        imManager = IMManager.getInstance();
     }
 
     /**
-     * 因为业务规则是只能加入一个群组，所以这里判断是否已经有一个群组
+     * 判断是否已有游戏房间
      * @return
      */
     public boolean isAlreadyInRoom(){
-        groupList = IMManager.getInstance().getAllGroupAndMember();
-        return groupList != null && groupList.size() > 0;
+        List<Group> groupList = imManager.requestGroupList();
+        for(Group group:groupList){
+            if(TextUtils.equals(group.getGroupName(), GAME_GROUP_NAME)){
+                currentRoom = group;
+                return true;
+            }
+        }
+        return false;
     }
 
-    public boolean createRoom(String groupName){
-        boolean result = IMManager.getInstance().createGroup(groupName);
-        if(result){
-            groupList = IMManager.getInstance().getAllGroupAndMember();
-            if(groupList.size() == 0){
-                result = false;
-            }
-            currentGroup = groupList.get(0);
-        }
-        return result;
-    }
-    public boolean joinRoom(String groupId){
-        boolean result = IMManager.getInstance().joinGroup(groupId);
-        if(result){
-            groupList = IMManager.getInstance().getAllGroupAndMember();
-            if(groupList.size() == 0){
-                result = false;
-            }
-            currentGroup = groupList.get(0);
-        }
-        return result;
+    /**
+     * 创建房间
+     * @return
+     */
+    public boolean createRoom(){
+        currentRoom = imManager.createGroup(GAME_GROUP_NAME, 10);
+        return currentRoom != null;
     }
 
+    /**
+     * 加入房间
+     * @param roomId
+     * @return
+     */
+    public boolean joinRoom(String roomId){
+        return imManager.joinGroup(roomId);
+    }
+
+    /**
+     * 判断是否是房间所有者
+     * @return
+     */
+    public boolean isRoomOwner(){
+        return currentRoom.getOwner().equals(imManager.getCurrentLoginUser());
+    }
+
+    /**
+     * 解散房间
+     * @return
+     */
+    public boolean destroyRoom(){
+        return imManager.destroyGroup(currentRoom.getGroupId());
+    }
+
+    /**
+     * 退出房间
+     * @return
+     */
     public boolean exitRoom(){
-        if(currentGroup.getOwner().equals(currentUsername)){
-            return IMManager.getInstance().destroyGroup(currentGroup.getGroupId());
-        }else{
-            return IMManager.getInstance().exitGroup(currentGroup.getGroupId());
-        }
+        return imManager.exitGroup(currentRoom.getGroupId());
+    }
+
+    /**
+     * 初始化游戏
+     */
+    public void initGame(){
+        currentGame = new Game();
+        currentGame.init(currentRoom.getMembers());
     }
 
     public void startGame(OperateCallBack callBack){
         //TODO 只有房间创建者才能开始游戏。
-        currentGame = new Game();
-        currentGame.init(currentGroup.getMembers());
     }
     public void stopGame(){
     }
     public void restartGame(){
-    }
-
-
-    public NextAction nextAction(){
-        //如果有人的血量到达了0，则死去，开始下一轮
-        return NextAction.NEXT_TURN;
-    }
-    public void next(){
-        switch (nextAction()){
-            case NEXT_ONE:
-                break;
-            case NEXT_TURN:
-                break;
-            //todo
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
-    public void onMessageReceivedEvent(MessageReceivedEvent event){
-
     }
 }

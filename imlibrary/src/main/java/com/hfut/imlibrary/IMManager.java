@@ -5,12 +5,13 @@ import android.text.TextUtils;
 
 import com.hfut.imlibrary.event.MessageReceivedEvent;
 import com.hfut.imlibrary.model.Group;
+import com.hfut.imlibrary.model.User;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMMessageListener;
+import com.hyphenate.chat.EMChatManager;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMCursorResult;
 import com.hyphenate.chat.EMGroup;
-import com.hyphenate.chat.EMGroupInfo;
 import com.hyphenate.chat.EMGroupManager;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
@@ -22,12 +23,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * IM工具类
+ * 即时通讯
+ * 注册、登录、登出
+ * 获取：当前用户的群组列表、群成员
+ * 搜索：群组、用户
+ * 群组：创建、加入、退出、解散
+ * 好友：添加、同意
+ * 消息：发送、接收
  *
  * @author cms
  */
 public class IMManager {
+    private EMClient emClient;
+    private EMChatManager emChatManager;
+    private EMGroupManager emGroupManager;
+
     private MessageReceivedListener messageReceivedListener;
+
+    private User currentLoginUser;
+
+
     private static IMManager instance = new IMManager();
 
     private IMManager() {
@@ -44,7 +59,10 @@ public class IMManager {
      */
     public void init(Application context) {
         EMOptions options = new EMOptions();
-        EMClient.getInstance().init(context, options);
+        emClient = EMClient.getInstance();
+        emChatManager = emClient.chatManager();
+        emGroupManager = emClient.groupManager();
+        emClient.init(context, options);
     }
 
     /**
@@ -59,7 +77,7 @@ public class IMManager {
             return false;
         }
         try {
-            EMClient.getInstance().createAccount(userName, password);
+            emClient.createAccount(userName, password);
             return true;
         } catch (HyphenateException e) {
             e.printStackTrace();
@@ -73,17 +91,18 @@ public class IMManager {
      * @param userName
      * @param password
      */
-    public void login(String userName, String password, final OperateCallBack callBack) {
+    public void login(final String userName, String password, final OperateCallBack callBack) {
         if (TextUtils.isEmpty(userName) || TextUtils.isEmpty(password)) {
             callBack.onFailure();
             return;
         }
-        EMClient.getInstance().login(userName, password, new EMCallBack() {
+        emClient.login(userName, password, new EMCallBack() {
             @Override
             public void onSuccess() {
+                currentLoginUser = new User(userName);
                 //开始监听接收消息事件
                 messageReceivedListener = new MessageReceivedListener();
-                EMClient.getInstance().chatManager().addMessageListener(messageReceivedListener);
+                emChatManager.addMessageListener(messageReceivedListener);
                 callBack.onSuccess();
             }
 
@@ -98,14 +117,19 @@ public class IMManager {
         });
     }
 
+    public User getCurrentLoginUser() {
+        return currentLoginUser;
+    }
+
     /**
      * 登出
      */
     public void logout(final OperateCallBack callBack) {
-        EMClient.getInstance().logout(true, new EMCallBack() {
+        emClient.logout(true, new EMCallBack() {
             @Override
             public void onSuccess() {
-                EMClient.getInstance().chatManager().removeMessageListener(messageReceivedListener);
+                emChatManager.removeMessageListener(messageReceivedListener);
+                currentLoginUser = null;
                 callBack.onSuccess();
             }
 
@@ -123,17 +147,18 @@ public class IMManager {
     /**
      * 创建群组
      */
-    public boolean createGroup(String groupName) {
+    public Group createGroup(String groupName, int maxUsers) {
         EMGroupManager.EMGroupOptions options = new EMGroupManager.EMGroupOptions();
-        options.maxUsers = 10;
+        options.maxUsers = maxUsers;
         //设置创建的群组所有人都可以无条件加入
         options.style = EMGroupManager.EMGroupStyle.EMGroupStylePublicOpenJoin;
         try {
-            EMGroup emGroup = EMClient.getInstance().groupManager().createGroup(groupName, "", new String[]{}, "", options);
-            return true;
+            EMGroup emGroup = emGroupManager.createGroup(groupName, "",
+                    new String[]{}, "", options);
+            return emGroup2Group(emGroup);
         } catch (HyphenateException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
@@ -144,7 +169,7 @@ public class IMManager {
      */
     public boolean joinGroup(String groupId) {
         try {
-            EMClient.getInstance().groupManager().joinGroup(groupId);
+            emGroupManager.joinGroup(groupId);
             return true;
         } catch (HyphenateException e) {
             e.printStackTrace();
@@ -159,7 +184,7 @@ public class IMManager {
      */
     public boolean destroyGroup(String groupId) {
         try {
-            EMClient.getInstance().groupManager().destroyGroup(groupId);
+            emGroupManager.destroyGroup(groupId);
             return true;
         } catch (HyphenateException e) {
             e.printStackTrace();
@@ -174,7 +199,7 @@ public class IMManager {
      */
     public boolean exitGroup(String groupId) {
         try {
-            EMClient.getInstance().groupManager().leaveGroup(groupId);
+            emGroupManager.leaveGroup(groupId);
             return true;
         } catch (HyphenateException e) {
             e.printStackTrace();
@@ -207,41 +232,69 @@ public class IMManager {
             public void onProgress(int progress, String status) {
             }
         });
-        EMClient.getInstance().chatManager().sendMessage(message);
+        emChatManager.sendMessage(message);
     }
 
-    private List<String> getGroupMember(String groupId) {
+    /**
+     * 从服务器上请求获取群组的全部成员
+     *
+     * @param groupId
+     * @return
+     */
+    private List<User> requestGroupMember(String groupId) {
         List<String> memberList = new ArrayList<>();
         EMCursorResult<String> result = null;
-        final int pageSize = 20;
+        final int pageSize = 100;
         //如果群成员较多，需要多次从服务器获取完成
-        //TODO 环信sdk里面的参考代码有问题！！
         do {
             try {
-                result = EMClient.getInstance().groupManager().fetchGroupMembers(groupId,
+                result = emGroupManager.fetchGroupMembers(groupId,
                         result != null ? result.getCursor() : "", pageSize);
             } catch (HyphenateException e) {
                 e.printStackTrace();
             }
-            if(result != null)
-                memberList.addAll(result.getData());
+            if (result == null)
+                break;
+            memberList.addAll(result.getData());
         } while (!TextUtils.isEmpty(result.getCursor()) && result.getData().size() == pageSize);
-        return memberList;
-    }
 
-    public List<Group> getAllGroupAndMember() {
-        List<EMGroup> groupList = new ArrayList<>();
+        return usernameList2UserList(memberList);
+    }
+    /**
+     * 从服务器上请求获取当前用户的群组列表
+     *
+     * @return
+     */
+    public List<Group> requestGroupList() {
         List<Group> result = new ArrayList<>();
         try {
-            groupList = EMClient.getInstance().groupManager().getJoinedGroupsFromServer();
-            for(EMGroup emGroup:groupList){
-                emGroup.getMembers().addAll(getGroupMember(emGroup.getGroupId()));
-            }
-            result = emGroupList2GroupList(groupList);
+            List<EMGroup> emGroupList = emGroupManager.getJoinedGroupsFromServer();
+            result.addAll(emGroupList2GroupList(emGroupList));
         } catch (HyphenateException e) {
             e.printStackTrace();
         }
         return result;
+    }
+    /**
+     * 搜索群组的基本信息
+     * @return
+     */
+    public Group requestGroupInfo(String groupId){
+        try {
+            EMGroup emGroup = emGroupManager.getGroupFromServer(groupId);
+            return emGroup2Group(emGroup);
+        } catch (HyphenateException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private List<User> usernameList2UserList(List<String> userNameList){
+        List<User> userList = new ArrayList<>();
+        for(String userName:userNameList){
+            userList.add(new User(userName));
+        }
+        return userList;
     }
 
     private List<Group> emGroupList2GroupList(List<EMGroup> emGroupList) {
@@ -251,11 +304,16 @@ public class IMManager {
         }
         return groupList;
     }
-    private Group emGroup2Group(EMGroup emGroup){
+
+    private Group emGroup2Group(EMGroup emGroup) {
         String groupId = emGroup.getGroupId();
-        String owner = emGroup.getOwner();
-        List<String> memberList = emGroup.getMembers();
-        return new Group(groupId, owner, memberList);
+        String groupName = emGroup.getGroupName();
+        User owner = new User(emGroup.getOwner());
+        List<User> memberList = new ArrayList<>();
+        for (String username : emGroup.getMembers()) {
+            memberList.add(new User(username));
+        }
+        return new Group(groupId, groupName, owner, memberList);
     }
 
     private class MessageReceivedListener implements EMMessageListener {
