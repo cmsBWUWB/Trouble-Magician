@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.hfut.trouble.socia.SociaFragment;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -46,16 +48,16 @@ public class MainActivity extends AppCompatActivity {
         switch (v.getId()){
             case R.id.tv_game:
                 getSupportFragmentManager().beginTransaction()
-                        .show(gameFragment)
                         .hide(sociaFragment)
                         .hide(profileFragment)
+                        .show(gameFragment)
                         .commit();
                 break;
             case R.id.tv_socia:
                 getSupportFragmentManager().beginTransaction()
                         .hide(gameFragment)
-                        .show(sociaFragment)
                         .hide(profileFragment)
+                        .show(sociaFragment)
                         .commit();
                 break;
             case R.id.tv_profile:
