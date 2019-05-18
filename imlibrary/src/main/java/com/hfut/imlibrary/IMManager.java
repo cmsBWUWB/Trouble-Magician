@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.hfut.imlibrary.event.MessageReceivedEvent;
 import com.hfut.imlibrary.model.Group;
+import com.hfut.imlibrary.model.Message;
 import com.hfut.imlibrary.model.User;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMMessageListener;
@@ -60,8 +61,6 @@ public class IMManager {
     public void init(Application context) {
         EMOptions options = new EMOptions();
         emClient = EMClient.getInstance();
-        emChatManager = emClient.chatManager();
-        emGroupManager = emClient.groupManager();
         emClient.init(context, options);
     }
 
@@ -99,6 +98,9 @@ public class IMManager {
         emClient.login(userName, password, new EMCallBack() {
             @Override
             public void onSuccess() {
+                emChatManager = emClient.chatManager();
+                emGroupManager = emClient.groupManager();
+
                 currentLoginUser = new User(userName);
                 //开始监听接收消息事件
                 messageReceivedListener = new MessageReceivedListener();
@@ -155,7 +157,7 @@ public class IMManager {
         try {
             EMGroup emGroup = emGroupManager.createGroup(groupName, "",
                     new String[]{}, "", options);
-            return emGroup2Group(emGroup);
+            return Group.emGroup2Group(emGroup);
         } catch (HyphenateException e) {
             e.printStackTrace();
             return null;
@@ -241,7 +243,7 @@ public class IMManager {
      * @param groupId
      * @return
      */
-    private List<User> requestGroupMember(String groupId) {
+    public List<User> requestGroupMember(String groupId) {
         List<String> memberList = new ArrayList<>();
         EMCursorResult<String> result = null;
         final int pageSize = 100;
@@ -258,7 +260,7 @@ public class IMManager {
             memberList.addAll(result.getData());
         } while (!TextUtils.isEmpty(result.getCursor()) && result.getData().size() == pageSize);
 
-        return usernameList2UserList(memberList);
+        return User.usernameList2UserList(memberList);
     }
     /**
      * 从服务器上请求获取当前用户的群组列表
@@ -269,7 +271,7 @@ public class IMManager {
         List<Group> result = new ArrayList<>();
         try {
             List<EMGroup> emGroupList = emGroupManager.getJoinedGroupsFromServer();
-            result.addAll(emGroupList2GroupList(emGroupList));
+            result.addAll(Group.emGroupList2GroupList(emGroupList));
         } catch (HyphenateException e) {
             e.printStackTrace();
         }
@@ -282,45 +284,22 @@ public class IMManager {
     public Group requestGroupInfo(String groupId){
         try {
             EMGroup emGroup = emGroupManager.getGroupFromServer(groupId);
-            return emGroup2Group(emGroup);
+            return Group.emGroup2Group(emGroup);
         } catch (HyphenateException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private List<User> usernameList2UserList(List<String> userNameList){
-        List<User> userList = new ArrayList<>();
-        for(String userName:userNameList){
-            userList.add(new User(userName));
-        }
-        return userList;
-    }
-
-    private List<Group> emGroupList2GroupList(List<EMGroup> emGroupList) {
-        List<Group> groupList = new ArrayList<>();
-        for (EMGroup emGroup : emGroupList) {
-            groupList.add(emGroup2Group(emGroup));
-        }
-        return groupList;
-    }
-
-    private Group emGroup2Group(EMGroup emGroup) {
-        String groupId = emGroup.getGroupId();
-        String groupName = emGroup.getGroupName();
-        User owner = new User(emGroup.getOwner());
-        List<User> memberList = new ArrayList<>();
-        for (String username : emGroup.getMembers()) {
-            memberList.add(new User(username));
-        }
-        return new Group(groupId, groupName, owner, memberList);
-    }
-
     private class MessageReceivedListener implements EMMessageListener {
         @Override
         public void onMessageReceived(List<EMMessage> messages) {
             //收到消息
-            EventBus.getDefault().post(new MessageReceivedEvent(messages));
+            List<Message> messageList = new ArrayList<>();
+            for(EMMessage emMessage:messages){
+                messageList.add(Message.emMessage2Message(emMessage));
+            }
+            EventBus.getDefault().post(new MessageReceivedEvent(messageList));
         }
 
         @Override

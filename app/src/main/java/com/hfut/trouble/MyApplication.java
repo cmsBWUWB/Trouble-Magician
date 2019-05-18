@@ -10,6 +10,5 @@ public class MyApplication extends Application {
         super.onCreate();
         // 初始化 IM 服务
         IMManager.getInstance().init(this);
-
     }
 }

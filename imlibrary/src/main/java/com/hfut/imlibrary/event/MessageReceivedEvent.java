@@ -1,16 +1,16 @@
 package com.hfut.imlibrary.event;
 
-import com.hyphenate.chat.EMMessage;
+import com.hfut.imlibrary.model.Message;
 
 import java.util.List;
 
 public class MessageReceivedEvent{
-    private List<EMMessage> emMessageList;
-    public MessageReceivedEvent(List<EMMessage> emMessageList) {
+    private List<Message> emMessageList;
+    public MessageReceivedEvent(List<Message> emMessageList) {
         this.emMessageList = emMessageList;
     }
 
-    public List<EMMessage> getEmMessageList() {
+    public List<Message> getEmMessageList() {
         return emMessageList;
     }
 }

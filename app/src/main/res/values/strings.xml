@@ -2,4 +2,12 @@
     <string name="app_name">出包魔法师</string>
     <string name="hint_username">请输入用户名（小写字母）</string>
     <string name="hint_password">请输入密码</string>
+    <string name="game">游戏</string>
+    <string name="socia">社交</string>
+    <string name="profile">我</string>
+    <string name="create_room">创建房间</string>
+    <string name="join_room">加入房间</string>
+    <string name="chat">聊天</string>
+    <string name="group">群组</string>
+    <string name="contact">通讯录</string>
 </resources>

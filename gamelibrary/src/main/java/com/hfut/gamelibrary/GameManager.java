@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
 import com.hfut.imlibrary.model.Group;
+import com.hfut.imlibrary.model.User;
 
 import java.util.List;
 
@@ -25,23 +26,18 @@ import java.util.List;
  */
 public class GameManager {
     public static final String GAME_GROUP_NAME = "unique trouble magician game";
+    private IMManager imManager;
+    private Group currentRoom;
+    private Game currentGame;
+
     private static GameManager instance = new GameManager();
     private GameManager(){
+        imManager = IMManager.getInstance();
     }
     public static GameManager getInstance(){
         return instance;
     }
 
-    private IMManager imManager;
-    private Group currentRoom;
-    private Game currentGame;
-
-    /**
-     * 初始化
-     */
-    public void initGameManager(){
-        imManager = IMManager.getInstance();
-    }
 
     /**
      * 判断是否已有游戏房间
@@ -52,6 +48,8 @@ public class GameManager {
         for(Group group:groupList){
             if(TextUtils.equals(group.getGroupName(), GAME_GROUP_NAME)){
                 currentRoom = group;
+                List<User> members = imManager.requestGroupMember(currentRoom.getGroupId());
+                currentRoom.getMembers().addAll(members);
                 return true;
             }
         }
@@ -63,8 +61,8 @@ public class GameManager {
      * @return
      */
     public boolean createRoom(){
-        currentRoom = imManager.createGroup(GAME_GROUP_NAME, 10);
-        return currentRoom != null;
+        imManager.createGroup(GAME_GROUP_NAME, 10);
+        return isAlreadyInRoom();
     }
 
     /**
@@ -73,7 +71,8 @@ public class GameManager {
      * @return
      */
     public boolean joinRoom(String roomId){
-        return imManager.joinGroup(roomId);
+        imManager.joinGroup(roomId);
+        return isAlreadyInRoom();
     }
 
     /**

@@ -15,7 +15,6 @@ public class Game {
         int point;//分数
         int blood;//血量
         Queue<Card> cardQueue;//手里的牌
-
     }
     private List<Player> playerList;//所有玩家
 
@@ -34,5 +33,4 @@ public class Game {
      */
     public void currentPlayerDoMagic(Card card){
     }
-
 }
