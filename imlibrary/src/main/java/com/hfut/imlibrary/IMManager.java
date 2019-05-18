@@ -8,6 +8,7 @@ import com.hfut.imlibrary.model.Group;
 import com.hfut.imlibrary.model.Message;
 import com.hfut.imlibrary.model.User;
 import com.hyphenate.EMCallBack;
+import com.hyphenate.EMError;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMChatManager;
 import com.hyphenate.chat.EMClient;
@@ -110,7 +111,11 @@ public class IMManager {
 
             @Override
             public void onError(int code, String error) {
-                callBack.onFailure();
+                if(code == EMError.USER_ALREADY_LOGIN) {
+                    callBack.onSuccess();
+                }else {
+                    callBack.onFailure();
+                }
             }
 
             @Override

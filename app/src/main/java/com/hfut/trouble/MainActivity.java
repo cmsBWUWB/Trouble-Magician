@@ -5,7 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.hfut.imlibrary.IMManager;
+import com.hfut.imlibrary.OperateCallBack;
 import com.hfut.trouble.socia.SociaFragment;
+import com.hfut.utils.thread.BusinessRunnable;
+import com.hfut.utils.thread.ThreadDispatcher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,10 +46,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //退出即登出账号
+        ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
+            @Override
+            public void doWorkInRun() {
+                IMManager.getInstance().logout(new OperateCallBack() {
+                    @Override
+                    public void onSuccess() {
+                    }
+
+                    @Override
+                    public void onFailure() {
+                    }
+                });
+            }
+        });
     }
 
-    public void changeFragment(View v){
-        switch (v.getId()){
+    public void changeFragment(View v) {
+        switch (v.getId()) {
             case R.id.tv_game:
                 getSupportFragmentManager().beginTransaction()
                         .hide(sociaFragment)

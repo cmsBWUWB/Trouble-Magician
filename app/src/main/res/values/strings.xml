@@ -10,4 +10,6 @@
     <string name="chat">聊天</string>
     <string name="group">群组</string>
     <string name="contact">通讯录</string>
+    <string name="login">登录</string>
+    <string name="register">注册</string>
 </resources>
