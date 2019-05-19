@@ -1,17 +1,10 @@
 package com.hfut.gamelibrary;
 
-import android.text.TextUtils;
-
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
-import com.hfut.imlibrary.model.Group;
-import com.hfut.imlibrary.model.User;
-
-import java.util.List;
 
 /**
- * 游戏房间以一个特殊的群组存在，有特定且唯一的群名决定
- *
+ * todo
  * 游戏步骤如下：
  * 1. 创建房间--创建游戏群组
  * 2. 加入房间--加入游戏群组
@@ -25,9 +18,7 @@ import java.util.List;
  *
  */
 public class GameManager {
-    public static final String GAME_GROUP_NAME = "unique trouble magician game";
     private IMManager imManager;
-    private Group currentRoom;
     private Game currentGame;
 
     private static GameManager instance = new GameManager();
@@ -44,16 +35,7 @@ public class GameManager {
      * @return
      */
     public boolean isAlreadyInRoom(){
-        List<Group> groupList = imManager.requestGroupList();
-        for(Group group:groupList){
-            if(TextUtils.equals(group.getGroupName(), GAME_GROUP_NAME)){
-                currentRoom = group;
-                List<User> members = imManager.requestGroupMember(currentRoom.getGroupId());
-                currentRoom.getMembers().addAll(members);
-                return true;
-            }
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -61,8 +43,7 @@ public class GameManager {
      * @return
      */
     public boolean createRoom(){
-        imManager.createGroup(GAME_GROUP_NAME, 10);
-        return isAlreadyInRoom();
+        return false;
     }
 
     /**
@@ -71,8 +52,7 @@ public class GameManager {
      * @return
      */
     public boolean joinRoom(String roomId){
-        imManager.joinGroup(roomId);
-        return isAlreadyInRoom();
+        return false;
     }
 
     /**
@@ -80,7 +60,7 @@ public class GameManager {
      * @return
      */
     public boolean isRoomOwner(){
-        return currentRoom.getOwner().equals(imManager.getCurrentLoginUser());
+        return false;
     }
 
     /**
@@ -88,7 +68,7 @@ public class GameManager {
      * @return
      */
     public boolean destroyRoom(){
-        return imManager.destroyGroup(currentRoom.getGroupId());
+        return false;
     }
 
     /**
@@ -96,15 +76,13 @@ public class GameManager {
      * @return
      */
     public boolean exitRoom(){
-        return imManager.exitGroup(currentRoom.getGroupId());
+        return false;
     }
 
     /**
      * 初始化游戏
      */
     public void initGame(){
-        currentGame = new Game();
-        currentGame.init(currentRoom.getMembers());
     }
 
     public void startGame(OperateCallBack callBack){
