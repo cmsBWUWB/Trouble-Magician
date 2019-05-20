@@ -1,10 +1,10 @@
 package com.hfut.trouble;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.hfut.base.activity.BaseActivity;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
 import com.hfut.trouble.socia.SociaFragment;
@@ -14,7 +14,7 @@ import com.hfut.utils.thread.ThreadDispatcher;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @BindView(R.id.tv_game)
     public TextView tvGame;
