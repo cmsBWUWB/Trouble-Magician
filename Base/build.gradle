@@ -12,7 +12,6 @@ android {
         versionCode project.APP_VERSION_CODE as int
         versionName "$APP_VERSION_NAME"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
 
