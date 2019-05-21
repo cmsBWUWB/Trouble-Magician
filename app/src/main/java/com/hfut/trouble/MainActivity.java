@@ -1,8 +1,16 @@
 package com.hfut.trouble;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.imlibrary.IMManager;
@@ -10,11 +18,12 @@ import com.hfut.imlibrary.OperateCallBack;
 import com.hfut.trouble.socia.SociaFragment;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
+import com.hfut.utils.utils.ToastUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.tv_game)
     public TextView tvGame;
@@ -46,21 +55,49 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //退出即登出账号
-        ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
-            @Override
-            public void doWorkInRun() {
-                IMManager.getInstance().logout(new OperateCallBack() {
-                    @Override
-                    public void onSuccess() {
-                    }
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = new MenuInflater(this);
+        menuInflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_add_friend:
+                showAddFriendDialog();
+                break;
+        }
+        return true;
+    }
+
+    private void showAddFriendDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View v = getLayoutInflater().inflate(R.layout.dialog_add_friend, null);
+        EditText etUsername = v.findViewById(R.id.et_username);
+        builder.setTitle(R.string.add_friend)
+                .setView(v)
+                .setPositiveButton("添加好友", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onFailure() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
+                            @Override
+                            public void doWorkInRun() {
+                                String username = etUsername.getText().toString();
+                                boolean success = IMManager.getInstance().requestAddFriend(username);
+                                ThreadDispatcher.getInstance().postToMainThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ToastUtils.Companion.show(MainActivity.this, success ? "请求添加成功，等待对方同意" : "请求失败，请检查网络", Toast.LENGTH_SHORT);
+                                    }
+                                });
+                            }
+                        });
                     }
-                });
-            }
-        });
+                }).show();
     }
 
     public void changeFragment(View v) {

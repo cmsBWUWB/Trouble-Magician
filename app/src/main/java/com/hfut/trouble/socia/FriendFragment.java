@@ -8,12 +8,30 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.hfut.imlibrary.IMManager;
+import com.hfut.imlibrary.event.FriendChangeEvent;
+import com.hfut.imlibrary.model.User;
 import com.hfut.trouble.R;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class FriendFragment extends Fragment {
+    @BindView(R.id.lv_friend)
+    ListView lvFriendList;
+    private FriendListAdapter friendListAdapter;
+
     public static FriendFragment newInstance() {
 
         Bundle args = new Bundle();
@@ -27,31 +45,24 @@ public class FriendFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_socia_friend, container, false);
-        ListView lv = v.findViewById(R.id.lv_friend);
-        lv.setAdapter(new BaseAdapter() {
-            @Override
-            public int getCount() {
-                return 30;
-            }
+        ButterKnife.bind(this, v);
 
-            @Override
-            public Object getItem(int i) {
-                return i;
-            }
+        friendListAdapter = new FriendListAdapter(inflater);
+        lvFriendList.setAdapter(friendListAdapter);
+        friendListAdapter.setData(IMManager.getInstance().getFriendList());
 
-            @Override
-            public long getItemId(int i) {
-                return i;
-            }
-
-            @Override
-            public View getView(int i, View view, ViewGroup viewGroup) {
-                TextView tv = new TextView(getContext());
-                tv.setHeight(80);
-                tv.setText("好友列表 " + i);
-                return tv;
-            }
-        });
+        EventBus.getDefault().register(this);
         return v;
+    }
+
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
+    public void onFriendChangeEvent(FriendChangeEvent event){
+        friendListAdapter.setData(IMManager.getInstance().getFriendList());
     }
 }

@@ -1,17 +1,15 @@
 package com.hfut.imlibrary.listener;
 
+import com.hfut.imlibrary.event.GroupChangeEvent;
 import com.hyphenate.EMGroupChangeListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
 
 public class GroupChangeListener implements EMGroupChangeListener {
-    private IMListener imListener;
-
-    public GroupChangeListener(IMListener imListener) {
-        this.imListener = imListener;
-    }
 
     @Override
     public void onInvitationReceived(String groupId, String groupName, String inviter, String reason) {
@@ -35,7 +33,8 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onRequestToJoinAccepted(String groupId, String groupName, String accepter) {
-        imListener.groupChanged();
+        EventBus.getDefault().post(new GroupChangeEvent());
+
     }
 
     @Override
@@ -44,7 +43,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onInvitationAccepted(String groupId, String invitee, String reason) {
-        imListener.groupMemberChanged();
+        EventBus.getDefault().post(new GroupChangeEvent());
     }
 
     @Override
@@ -54,17 +53,17 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onUserRemoved(String groupId, String groupName) {
-        imListener.groupChanged();
+        EventBus.getDefault().post(new GroupChangeEvent());
     }
 
     @Override
     public void onGroupDestroyed(String groupId, String groupName) {
-        imListener.groupChanged();
+        EventBus.getDefault().post(new GroupChangeEvent());
     }
 
     @Override
     public void onAutoAcceptInvitationFromGroup(String groupId, String inviter, String inviteMessage) {
-        imListener.groupChanged();
+        EventBus.getDefault().post(new GroupChangeEvent());
     }
 
     @Override

@@ -1,29 +1,25 @@
 package com.hfut.imlibrary.listener;
 
+import com.hfut.imlibrary.IMUtils;
+import com.hfut.imlibrary.event.MessageReceivedEvent;
 import com.hfut.imlibrary.model.Message;
 import com.hyphenate.EMMessageListener;
-import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.hfut.imlibrary.IMManager.emMessage2Message;
-
 public class MessageReceivedListener implements EMMessageListener {
-    private IMListener imListener;
-
-    public MessageReceivedListener(IMListener imListener) {
-        this.imListener = imListener;
-    }
-
     @Override
     public void onMessageReceived(List<EMMessage> messages) {
         List<Message> messageList = new ArrayList<>();
         for(EMMessage emMessage:messages){
-            messageList.add(emMessage2Message(emMessage));
+            messageList.add(IMUtils.emMessage2Message(emMessage));
         }
-        imListener.messageReceived(messageList);
+        // todo 将消息放入对应的会话当中
+        EventBus.getDefault().post(new MessageReceivedEvent());
     }
 
     @Override

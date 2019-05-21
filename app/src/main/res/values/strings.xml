@@ -12,4 +12,7 @@
     <string name="contact">通讯录</string>
     <string name="login">登录</string>
     <string name="register">注册</string>
+    <string name="welcome_content">出包魔法师</string>
+    <string name="logout">登出</string>
+    <string name="add_friend">添加好友</string>
 </resources>

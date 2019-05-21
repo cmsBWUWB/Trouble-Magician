@@ -24,6 +24,7 @@ public class SociaFragment extends Fragment {
     @BindView(R.id.tv_group)
     public TextView tvGroup;
 
+
     @BindView(R.id.vp_socia)
     public ViewPager vpSocia;
     public Fragment[] fragments;

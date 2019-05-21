@@ -1,24 +1,31 @@
 package com.hfut.imlibrary.listener;
 
+import com.hfut.imlibrary.event.FriendChangeEvent;
+import com.hfut.imlibrary.model.User;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 
-public class FriendChangeListener implements EMContactListener {
-    private IMListener imListener;
+import org.greenrobot.eventbus.EventBus;
 
-    public FriendChangeListener(IMListener imListener) {
-        this.imListener = imListener;
+import java.util.List;
+
+public class FriendChangeListener implements EMContactListener {
+    private List<User> friendList;
+    public FriendChangeListener(List<User> friendList){
+        this.friendList = friendList;
     }
 
     @Override
     public void onContactAdded(String username) {
-        imListener.friendChanged();
+        friendList.add(new User(username));
+        EventBus.getDefault().post(new FriendChangeEvent());
     }
 
     @Override
     public void onContactDeleted(String username) {
-        imListener.friendChanged();
+        friendList.remove(new User(username));
+        EventBus.getDefault().post(new FriendChangeEvent());
     }
 
     @Override
@@ -33,11 +40,10 @@ public class FriendChangeListener implements EMContactListener {
 
     @Override
     public void onFriendRequestAccepted(String username) {
-        imListener.friendChanged();
+        EventBus.getDefault().post(new FriendChangeEvent());
     }
 
     @Override
     public void onFriendRequestDeclined(String username) {
-
     }
 }
