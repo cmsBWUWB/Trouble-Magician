@@ -18,18 +18,20 @@ public class IMUtils {
         List<Message> messageList = new ArrayList<>();
         Chat.ChatType type = emConversation.getType() == EMConversation.EMConversationType.Chat ?
                 Chat.ChatType.FRIEND : Chat.ChatType.GROUP;
-        Chat chat = new Chat(type, messageList);
         for (EMMessage emMessage : emMessageList) {
             messageList.add(emMessage2Message(emMessage));
         }
-        return chat;
+        return new Chat(type,
+                emConversation.conversationId(),
+                emConversation.getLastMessage().getBody().toString(),
+                messageList);
     }
 
     public static Group emGroup2Group(EMGroup emGroup) {
         String groupId = emGroup.getGroupId();
         String groupName = emGroup.getGroupName();
         User owner = new User(emGroup.getOwner());
-        return new Group(groupId, groupName, owner.getUsername(), new ArrayList<User>());
+        return new Group(groupId, groupName, owner.getUserId(), new ArrayList<User>());
     }
 
     public static List<Group> emGroupList2GroupList(List<EMGroup> emGroupList) {
@@ -41,10 +43,10 @@ public class IMUtils {
     }
 
     public static Message emMessage2Message(EMMessage emMessage) {
-        return new Message(emMessage.getBody().toString(),
+        return new Message(
                 emMessage.getFrom(),
-                emMessage.getMsgTime(),
-                emMessage.getTo());
+                emMessage.getBody().toString(),
+                emMessage.getMsgTime());
     }
 
     public static List<User> usernameList2UserList(List<String> userNameList) {

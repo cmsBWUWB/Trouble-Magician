@@ -1,5 +1,6 @@
 package com.hfut.trouble.socia;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,8 +8,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.hfut.imlibrary.model.Chat;
 import com.hfut.trouble.R;
 
 import butterknife.BindView;
@@ -31,6 +34,16 @@ public class ChatFragment extends Fragment{
         View v = inflater.inflate(R.layout.fragment_socia_chat, container, false);
         ButterKnife.bind(this, v);
         lvChatList.setAdapter(new ChatListAdapter(inflater));
+        lvChatList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Chat chat = (Chat) lvChatList.getItemAtPosition(position);
+                Intent intent = new Intent(getActivity(), ChatActivity.class);
+                intent.putExtra("type", chat.getChatType());
+                intent.putExtra("target", chat.getTarget());
+                startActivity(intent);
+            }
+        });
         return v;
     }
 }

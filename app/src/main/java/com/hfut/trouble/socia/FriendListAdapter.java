@@ -21,7 +21,8 @@ public class FriendListAdapter extends BaseAdapter {
         this.inflater = inflater;
         this.friendList = new ArrayList<>();
     }
-    public void setData(List<User> friendList){
+
+    public void setData(List<User> friendList) {
         this.friendList = friendList;
         this.notifyDataSetChanged();
     }
@@ -32,8 +33,8 @@ public class FriendListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int i) {
-        return i;
+    public User getItem(int i) {
+        return friendList.get(i);
     }
 
     @Override
@@ -43,17 +44,17 @@ public class FriendListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder viewHolder = null;
+        ViewHolder viewHolder;
         if (view == null) {
             view = inflater.inflate(R.layout.item_lv_friendlist, viewGroup, false);
             viewHolder = new ViewHolder();
             viewHolder.setTvUsername(view.findViewById(R.id.tv_item_friend));
             view.setTag(viewHolder);
-        }else {
+        } else {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        viewHolder.getTvUsername().setText(friendList.get(i).getUsername());
+        viewHolder.getTvUsername().setText(friendList.get(i).getUserId());
 
         return view;
     }

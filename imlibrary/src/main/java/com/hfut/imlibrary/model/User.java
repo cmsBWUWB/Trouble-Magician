@@ -3,19 +3,13 @@ package com.hfut.imlibrary.model;
 import android.text.TextUtils;
 
 public class User {
-    private String username;
+    private String userId;
 
-    public User(String username) {
-        this.username = username;
+    public User(String userId) {
+        this.userId = userId;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof User && TextUtils.equals(
-                ((User) obj).username, username);
+    public String getUserId() {
+        return userId;
     }
 }

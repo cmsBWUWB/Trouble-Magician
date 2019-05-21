@@ -5,13 +5,13 @@ import java.util.List;
 public class Group {
     private String groupId;
     private String groupName;
-    private String ownerUsername;
+    private String ownerUserId;
     private List<User> members;
 
-    public Group(String groupId, String groupName, String ownerUsername, List<User> members) {
+    public Group(String groupId, String groupName, String ownerUserId, List<User> members) {
         this.groupId = groupId;
         this.groupName = groupName;
-        this.ownerUsername = ownerUsername;
+        this.ownerUserId = ownerUserId;
         this.members = members;
     }
 
@@ -23,11 +23,11 @@ public class Group {
         return groupName;
     }
 
-    public String getOwnerUsername() {
-        return ownerUsername;
+    public String getOwnerUserId() {
+        return ownerUserId;
     }
 
-    public List<User> getMembers(){
+    public List<User> getMembers() {
         return members;
     }
 }

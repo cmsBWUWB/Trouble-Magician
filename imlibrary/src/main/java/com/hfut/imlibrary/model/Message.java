@@ -1,20 +1,18 @@
 package com.hfut.imlibrary.model;
 
 public class Message {
-    private String username;
+    private String authorId;
     private String content;
     private long time;
-    private String target;
 
-    public Message(String username, String content, long time, String target) {
-        this.username = username;
+    public Message(String authorId, String content, long time) {
+        this.authorId = authorId;
         this.content = content;
         this.time = time;
-        this.target = target;
     }
 
-    public String getUsername() {
-        return username;
+    public String getAuthorId() {
+        return authorId;
     }
 
     public String getContent() {
@@ -23,9 +21,5 @@ public class Message {
 
     public long getTime() {
         return time;
-    }
-
-    public String getTarget() {
-        return target;
     }
 }
