@@ -1,1 +1,1 @@
-include ':app', ':imlibrary', ':Utils', ':gamelibrary', ':database' ,':Base'
+include ':app', ':imlibrary', ':Utils', ':gamelibrary', ':database', ':Bmob',':Base'
