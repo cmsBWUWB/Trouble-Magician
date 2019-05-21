@@ -26,4 +26,5 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:$ANDROID_X_VERSION"
     implementation 'org.greenrobot:greendao:3.2.2'
+    implementation project(path: ':Bmob')
 }

@@ -14,6 +14,8 @@ import com.socks.library.KLog;
 
 import java.lang.ref.WeakReference;
 
+import xiaoma.com.bomb.BmobManager;
+
 public class SplashActivity extends BaseActivity {
     private MyHandler myHandler;
     private BusinessRunnable businessRunnable;
@@ -22,6 +24,8 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        //初始化Bmob服务
+        BmobManager.getInstance().init(this);
 
         myHandler = new MyHandler(this);
 
