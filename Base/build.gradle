@@ -26,4 +26,5 @@ android {
 
 dependencies {
     implementation project(':Utils')
+    implementation "androidx.appcompat:appcompat:$ANDROID_X_VERSION"
 }

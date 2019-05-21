@@ -1,8 +1,8 @@
 package com.hfut.base.activity
 
-import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.hfut.utils.utils.ToastUtils
 
 /**
