@@ -1,6 +1,9 @@
 package com.hfut.database.entity;
 
-import org.greenrobot.greendao.annotation.*;
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class GroupJoinUser {

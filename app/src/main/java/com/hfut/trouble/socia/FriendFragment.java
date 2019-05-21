@@ -44,6 +44,7 @@ public class FriendFragment extends Fragment {
         lvFriendList.setAdapter(friendListAdapter);
         friendListAdapter.setData(IMManager.getInstance().getFriendList());
 
+
         EventBus.getDefault().register(this);
         return v;
     }
