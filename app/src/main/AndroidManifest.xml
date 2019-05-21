@@ -35,6 +35,7 @@
         </activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity"/>
+        <activity android:name=".socia.ChatActivity" />
     </application>
 
 </manifest>

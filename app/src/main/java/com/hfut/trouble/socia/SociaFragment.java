@@ -30,7 +30,6 @@ public class SociaFragment extends Fragment {
     public Fragment[] fragments;
 
     public static SociaFragment newInstance() {
-
         Bundle args = new Bundle();
 
         SociaFragment fragment = new SociaFragment();

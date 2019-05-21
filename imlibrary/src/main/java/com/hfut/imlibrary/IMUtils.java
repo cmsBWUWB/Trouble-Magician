@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IMUtils {
+
     public static Chat emConversation2Chat(EMConversation emConversation) {
         List<EMMessage> emMessageList = emConversation.getAllMessages();
         List<Message> messageList = new ArrayList<>();

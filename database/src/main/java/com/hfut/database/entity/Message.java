@@ -1,39 +1,59 @@
 package com.hfut.database.entity;
 
-public class Message {
-    private long id;
-    private String chatId;
-    private String username;
-    private long time;
-    private String content;
-    private String target;
+import org.greenrobot.greendao.annotation.*;
 
-    public Message(String chatId, String content, long time, String username, String target) {
-        this.chatId = chatId;
+@Entity
+public class Message {
+    @Id
+    private Long id;
+    @NotNull
+    private Long authorId;
+    @NotNull
+    private String content;
+    @NotNull
+    private long time;
+    @NotNull
+    private Long chatId;
+    @Generated(hash = 1610049851)
+    public Message(Long id, @NotNull Long authorId, @NotNull String content,
+            long time, @NotNull Long chatId) {
+        this.id = id;
+        this.authorId = authorId;
         this.content = content;
         this.time = time;
-        this.username = username;
-        this.target = target;
+        this.chatId = chatId;
     }
-
-    public String getChatId() {
-        return chatId;
+    @Generated(hash = 637306882)
+    public Message() {
     }
-
+    public Long getId() {
+        return this.id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public Long getAuthorId() {
+        return this.authorId;
+    }
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
+    }
     public String getContent() {
-        return content;
+        return this.content;
     }
-
+    public void setContent(String content) {
+        this.content = content;
+    }
     public long getTime() {
-        return time;
+        return this.time;
     }
-
-    public String getUsername() {
-        return username;
+    public void setTime(long time) {
+        this.time = time;
     }
-
-    public String getTarget() {
-        return target;
+    public Long getChatId() {
+        return this.chatId;
     }
-
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
 }
