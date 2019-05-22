@@ -11,20 +11,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.imlibrary.IMManager;
-import com.hfut.imlibrary.model.Group;
-import com.hfut.trouble.game.GameRoomActivity;
+import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.trouble.socia.SociaFragment;
-import com.hfut.utils.thread.BusinessRunnable;
-import com.hfut.utils.thread.ThreadDispatcher;
-import com.hfut.utils.utils.ToastUtils;
+import com.socks.library.KLog;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity {
 
@@ -89,17 +83,19 @@ public class MainActivity extends BaseActivity {
                 .setPositiveButton("添加好友", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
+                        String username = etUsername.getText().toString();
+                        IMManager.getInstance().requestAddFriend(username,new BaseEMCallBack(){
                             @Override
-                            public void doWorkInRun() {
-                                String username = etUsername.getText().toString();
-                                boolean success = IMManager.getInstance().requestAddFriend(username);
-                                ThreadDispatcher.getInstance().postToMainThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        ToastUtils.Companion.show(MainActivity.this, success ? "请求添加成功，等待对方同意" : "请求失败，请检查网络", Toast.LENGTH_SHORT);
-                                    }
-                                });
+                            public void onSuccess() {
+                                super.onSuccess();
+                                showToast(R.string.add_success_hint);
+                            }
+
+                            @Override
+                            public void onError(int code, String error) {
+                                super.onError(code, error);
+                                KLog.e("code = " + code + "; error = " + error);
+                                showToast(R.string.error_hint);
                             }
                         });
                     }

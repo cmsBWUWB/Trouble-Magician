@@ -1,6 +1,5 @@
 package com.hfut.utils.utils
 
-import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 
@@ -22,6 +21,11 @@ class Utils {
                 e.printStackTrace()
                 false
             }
+        }
+
+        @JvmStatic
+        fun isListEmpty(list: Collection<*>?): Boolean {
+            return list == null || list.isEmpty()
         }
     }
 }

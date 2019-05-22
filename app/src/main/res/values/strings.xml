@@ -16,6 +16,11 @@
     <string name="logout">登出</string>
     <string name="add_friend">添加好友</string>
     <string name="send">发送</string>
-    <string name="error_hint">操作失败，请稍后再试</string>
+    <string name="error_hint">请求失败，请检查网络</string>
+    <string name="add_success_hint">请求添加成功，等待对方同意</string>
     <string name="id_group">房间号：%s</string>
+    <string name="exit_group_success">退出房间成功</string>
+    <string name="exit_group_fail">退出房间失败</string>
+    <string name="destroy_group_success">解散房间成功</string>
+    <string name="destroy_group_fail">解散房间失败</string>
 </resources>

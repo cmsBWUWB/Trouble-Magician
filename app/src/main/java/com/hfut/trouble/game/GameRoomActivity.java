@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.imlibrary.IMManager;
+import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.imlibrary.listener.BaseGroupChangeListener;
 import com.hfut.imlibrary.model.Group;
 import com.hfut.trouble.R;
@@ -70,9 +71,37 @@ public class GameRoomActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (TextUtils.equals(mGroup.getOwnerUserId(), IMManager.getInstance().getCurrentLoginUser().getUserId())) {
-            IMManager.getInstance().destroyGroup(mGroup.getGroupId());
+            IMManager.getInstance().destroyGroup(mGroup.getGroupId(),new BaseEMCallBack(){
+                @Override
+                public void onSuccess() {
+                    super.onSuccess();
+                    showToast(R.string.destroy_group_success);
+                    KLog.i("destroy group success");
+                }
+
+                @Override
+                public void onError(int code, String error) {
+                    super.onError(code, error);
+                    showToast(R.string.destroy_group_fail);
+                    KLog.i("code = " + code + ";errorMessage = " + error);
+                }
+            });
         }else {
-            IMManager.getInstance().exitGroup(mGroup.getGroupId());
+            IMManager.getInstance().exitGroup(mGroup.getGroupId(),new BaseEMCallBack(){
+                @Override
+                public void onSuccess() {
+                    super.onSuccess();
+                    showToast(R.string.exit_group_success);
+                    KLog.i("exit group success");
+                }
+
+                @Override
+                public void onError(int code, String error) {
+                    super.onError(code, error);
+                    showToast(R.string.exit_group_fail);
+                    KLog.i("code = " + code + ";errorMessage = " + error);
+                }
+            });
         }
         IMManager.getInstance().removeGroupChangeListener(mGroupChangeListener);
     }

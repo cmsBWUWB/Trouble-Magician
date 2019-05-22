@@ -46,7 +46,7 @@ public class GameFragment extends Fragment {
 
                     @Override
                     public void onFail(int errorCode, @NotNull String errorMsg) {
-
+                        KLog.e("errorCode = " + errorCode + "; errorMsg = " + errorMsg);
                     }
                 });
             }
