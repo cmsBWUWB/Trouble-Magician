@@ -90,17 +90,29 @@ public class GameRoomActivity extends BaseActivity {
             public void onRequestToJoinAccepted(String groupId, String groupName, String accepter) {
                 super.onRequestToJoinAccepted(groupId, groupName, accepter);
                 syncGroupMember();
-                KLog.i("wzt", "groupName = " + groupName);
+                KLog.i( "groupName = " + groupName);
             }
 
             @Override
             public void onInvitationAccepted(String groupId, String invitee, String reason) {
                 super.onInvitationAccepted(groupId, invitee, reason);
                 syncGroupMember();
-                KLog.i("wzt", "groupId = " + groupId);
+                KLog.i("groupId = " + groupId);
             }
 
+            @Override
+            public void onMemberJoined(String groupId, String member) {
+                super.onMemberJoined(groupId, member);
+                KLog.i("groupId = " + groupId + ";member = " + member);
+                syncGroupMember();
+            }
 
+            @Override
+            public void onMemberExited(String groupId, String member) {
+                super.onMemberExited(groupId, member);
+                KLog.i("groupId = " + groupId + ";member = " + member);
+                syncGroupMember();
+            }
         };
         IMManager.getInstance().addGroupChangeListener(mGroupChangeListener);
     }

@@ -21,9 +21,11 @@ import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMCursorResult;
 import com.hyphenate.chat.EMGroup;
 import com.hyphenate.chat.EMGroupManager;
+import com.hyphenate.chat.EMGroupOptions;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.exceptions.HyphenateException;
+import com.socks.library.KLog;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -294,7 +296,7 @@ public class IMManager {
      * 创建群组
      */
     public void createGroup(final String groupName, final int maxUsers, @NotNull final DefaultCallback<Group> callback) {
-        EMGroupManager.EMGroupOptions options = new EMGroupManager.EMGroupOptions();
+        EMGroupOptions options = new EMGroupOptions();
         options.maxUsers = maxUsers;
         //设置创建的群组所有人都可以无条件加入
         options.style = EMGroupManager.EMGroupStyle.EMGroupStylePublicOpenJoin;

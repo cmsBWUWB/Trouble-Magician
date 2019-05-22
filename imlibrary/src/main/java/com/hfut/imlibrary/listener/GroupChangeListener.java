@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.hfut.imlibrary.event.GroupChangeEvent;
 import com.hyphenate.EMGroupChangeListener;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMMucSharedFile;
 import com.hyphenate.exceptions.HyphenateException;
 import com.socks.library.KLog;
 
@@ -162,6 +163,51 @@ public class GroupChangeListener implements EMGroupChangeListener {
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onOwnerChanged(groupId, newOwner, oldOwner);
+        }
+    }
+
+    @Override
+    public void onMemberJoined(String groupId, String member) {
+        KLog.i("groupId = " + groupId);
+        for (BaseGroupChangeListener emGroupChangeListener : listeners) {
+            if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
+            emGroupChangeListener.onMemberJoined(groupId, member);
+        }
+    }
+
+    @Override
+    public void onMemberExited(String groupId, String member) {
+        KLog.i("groupId = " + groupId);
+        for (BaseGroupChangeListener emGroupChangeListener : listeners) {
+            if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
+            emGroupChangeListener.onMemberExited(groupId, member);
+        }
+    }
+
+    @Override
+    public void onAnnouncementChanged(String groupId, String announcement) {
+        KLog.i("groupId = " + groupId);
+        for (BaseGroupChangeListener emGroupChangeListener : listeners) {
+            if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
+            emGroupChangeListener.onAnnouncementChanged(groupId, announcement);
+        }
+    }
+
+    @Override
+    public void onSharedFileAdded(String groupId, EMMucSharedFile sharedFile) {
+        KLog.i("groupId = " + groupId);
+        for (BaseGroupChangeListener emGroupChangeListener : listeners) {
+            if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
+            emGroupChangeListener.onSharedFileAdded(groupId, sharedFile);
+        }
+    }
+
+    @Override
+    public void onSharedFileDeleted(String groupId, String fileId) {
+        KLog.i("groupId = " + groupId);
+        for (BaseGroupChangeListener emGroupChangeListener : listeners) {
+            if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
+            emGroupChangeListener.onSharedFileDeleted(groupId, fileId);
         }
     }
 }
