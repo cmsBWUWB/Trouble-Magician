@@ -2,6 +2,7 @@ package com.hfut.trouble.socia;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -65,21 +66,7 @@ public class FriendFragment extends Fragment {
             }
         });
 
-        ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
-            @Override
-            public void doWorkInRun() {
-                List<User> friendList = IMManager.getInstance().getFriendListFromNet();
-                if(friendList == null){
-                    return;
-                }
-                ThreadDispatcher.getInstance().postToMainThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        friendListAdapter.setData(IMManager.getInstance().getFriendListFromLocal());
-                    }
-                });
-            }
-        });
+        refreshFriendList();
 
         EventBus.getDefault().register(this);
         return v;
@@ -92,7 +79,22 @@ public class FriendFragment extends Fragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
-    public void onFriendChangeEvent(FriendChangeEvent event){
-        friendListAdapter.setData(IMManager.getInstance().getFriendListFromLocal());
+    public void onFriendChangeEvent(FriendChangeEvent event) {
+        refreshFriendList();
+    }
+
+    private void refreshFriendList(){
+        ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
+            @Override
+            public void doWorkInRun() {
+                List<User> friendList = IMManager.getInstance().getFriendList();
+                ThreadDispatcher.getInstance().postToMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        friendListAdapter.setData(friendList);
+                    }
+                });
+            }
+        });
     }
 }

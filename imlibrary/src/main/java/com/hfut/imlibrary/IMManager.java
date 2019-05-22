@@ -67,7 +67,9 @@ public class IMManager {
         EMOptions options = new EMOptions();
         emClient = EMClient.getInstance();
         emClient.init(context, options);
-        onLoginSuccess();
+        if(isLogin()) {
+            onLoginSuccess();
+        }
     }
 
     /**
@@ -86,10 +88,6 @@ public class IMManager {
             e.printStackTrace();
             return false;
         }
-    }
-
-    public boolean isLogin() {
-        return emClient.isLoggedInBefore();
     }
 
     /**
@@ -118,6 +116,13 @@ public class IMManager {
             public void onProgress(int progress, String status) {
             }
         });
+    }
+
+    /**
+     * 是否已登录
+     */
+    public boolean isLogin() {
+        return emClient.isLoggedInBefore();
     }
 
     /**
@@ -150,7 +155,7 @@ public class IMManager {
         });
     }
 
-    public void onLoginSuccess() {
+    private void onLoginSuccess() {
         emChatManager = emClient.chatManager();
         emGroupManager = emClient.groupManager();
         emContactManager = emClient.contactManager();
@@ -162,7 +167,7 @@ public class IMManager {
         unsetListener();
     }
 
-    public void setListener() {
+    private void setListener() {
         messageReceivedListener = new MessageReceivedListener();
         groupChangeListener = new GroupChangeListener();
         friendChangeListener = new FriendChangeListener();
@@ -172,7 +177,7 @@ public class IMManager {
         emContactManager.setContactListener(friendChangeListener);
     }
 
-    public void unsetListener() {
+    private void unsetListener() {
         emChatManager.removeMessageListener(messageReceivedListener);
         emGroupManager.removeGroupChangeListener(groupChangeListener);
         emContactManager.removeContactListener(friendChangeListener);
@@ -185,28 +190,21 @@ public class IMManager {
     /**
      * 获取好友列表
      */
-    public List<User> getFriendListFromNet() {
+    public List<User> getFriendList() {
         try {
-            friendList = IMUtils.userIdList2UserList(emContactManager.getAllContactsFromServer());
-            return friendList;
+            return IMUtils.userIdList2UserList(emContactManager.getAllContactsFromServer());
         } catch (HyphenateException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    private List<User> friendList;
-
-    public List<User> getFriendListFromLocal() {
-        return friendList;
-    }
-
     /**
      * 申请添加好友
      */
-    public boolean requestAddFriend(String username) {
+    public boolean requestAddFriend(String userId) {
         try {
-            emContactManager.addContact(username, "");
+            emContactManager.addContact(userId, "");
             Log.e(TAG, "requestAddFriend: success");
             return true;
         } catch (HyphenateException e) {
@@ -249,7 +247,7 @@ public class IMManager {
     /**
      * 从本地获取聊天会话列表
      */
-    public List<Chat> getConversationListFromLocal() {
+    public List<Chat> getConversationList() {
         emChatManager.loadAllConversations();
         Map<String, EMConversation> allConversations = emChatManager.getAllConversations();
 
@@ -264,9 +262,8 @@ public class IMManager {
      * 从本地获取聊天记录
      * @param targetId 群id或者好友id
      */
-    public List<Message> getMessageListFromLocal(String targetId) {
+    public List<Message> getMessageList(String targetId) {
         emChatManager.loadAllConversations();
-
         List<Message> result = new ArrayList<>();
         EMConversation emConversation = emChatManager.getConversation(targetId);
         if (emConversation != null) {
@@ -278,13 +275,11 @@ public class IMManager {
         return result;
     }
 
-
     /**
      * 创建群组
      */
-    public Group createGroup(String groupName, int maxUsers) {
+    public Group createGroup(String groupName) {
         EMGroupManager.EMGroupOptions options = new EMGroupManager.EMGroupOptions();
-        options.maxUsers = maxUsers;
         //设置创建的群组所有人都可以无条件加入
         options.style = EMGroupManager.EMGroupStyle.EMGroupStylePublicOpenJoin;
         try {
@@ -340,9 +335,9 @@ public class IMManager {
     /**
      * 拉人入群
      */
-    public boolean inviteJoinGroup(String username, String groupId) {
+    public boolean inviteJoinGroup(String userId, String groupId) {
         try {
-            emGroupManager.inviteUser(groupId, new String[]{username}, "");
+            emGroupManager.inviteUser(groupId, new String[]{userId}, "");
             return true;
         } catch (HyphenateException e) {
             e.printStackTrace();
@@ -351,13 +346,13 @@ public class IMManager {
     }
 
     /**
-     * 拉人入群
+     * 拉多人入群
      */
-    public boolean inviteJoinGroup(List<String> username, String groupId) {
-        if (username.size() == 0) {
+    public boolean inviteJoinGroup(List<String> userIdList, String groupId) {
+        if (userIdList.size() == 0) {
             return true;
         }
-        String[] usernameList = (String[]) username.toArray();
+        String[] usernameList = (String[]) userIdList.toArray();
         if (usernameList == null) {
             return false;
         }
@@ -399,7 +394,10 @@ public class IMManager {
     }
 
 
-    public List<Group> getGroupListFromNet() {
+    /**
+     * 获取当前用户所有的群
+     */
+    public List<Group> getGroupList() {
         try {
             return IMUtils.emGroupList2GroupList(emGroupManager.getJoinedGroupsFromServer());
         } catch (HyphenateException e) {
@@ -408,7 +406,10 @@ public class IMManager {
         }
     }
 
-    public List<User> getGroupMemberFromNet(String groupId) {
+    /**
+     * 获取群组的所有成员
+     */
+    public List<User> getGroupMemberList(String groupId) {
         List<User> memberList = new ArrayList<>();
         EMCursorResult<String> result = null;
         final int pageSize = 100;

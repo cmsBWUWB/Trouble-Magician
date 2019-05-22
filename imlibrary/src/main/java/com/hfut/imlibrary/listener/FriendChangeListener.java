@@ -1,6 +1,5 @@
 package com.hfut.imlibrary.listener;
 
-import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.event.FriendChangeEvent;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
@@ -11,13 +10,11 @@ import org.greenrobot.eventbus.EventBus;
 public class FriendChangeListener implements EMContactListener {
     @Override
     public void onContactAdded(String username) {
-        IMManager.getInstance().getFriendListFromNet();
         EventBus.getDefault().post(new FriendChangeEvent());
     }
 
     @Override
     public void onContactDeleted(String username) {
-        IMManager.getInstance().getFriendListFromNet();
         EventBus.getDefault().post(new FriendChangeEvent());
     }
 

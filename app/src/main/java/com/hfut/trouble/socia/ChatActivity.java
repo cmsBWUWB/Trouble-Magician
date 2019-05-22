@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
-import com.hfut.imlibrary.model.Chat;
 import com.hfut.imlibrary.model.Message;
 import com.hfut.trouble.R;
 
@@ -47,7 +46,7 @@ public class ChatActivity extends BaseActivity {
         //初始化消息列表
         messageAdapter = new MessageAdapter(getLayoutInflater(), currentUserId);
         lvChatMessage.setAdapter(messageAdapter);
-        messageAdapter.setData(IMManager.getInstance().getMessageListFromLocal(targetId));
+        messageAdapter.setData(IMManager.getInstance().getMessageList(targetId));
 
         //点击按钮则发送消息
         btSend.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +59,7 @@ public class ChatActivity extends BaseActivity {
                             @Override
                             public void run() {
                                 etMessage.setText("");
-                                messageAdapter.setData(IMManager.getInstance().getMessageListFromLocal(targetId));
+                                messageAdapter.setData(IMManager.getInstance().getMessageList(targetId));
                             }
                         });
                     }
