@@ -4,6 +4,7 @@ import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.hfut.imlibrary.event.MessageReceivedEvent;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.imlibrary.listener.BaseGroupChangeListener;
 import com.hfut.imlibrary.listener.FriendChangeListener;
@@ -27,6 +28,7 @@ import com.hyphenate.chat.EMOptions;
 import com.hyphenate.exceptions.HyphenateException;
 import com.socks.library.KLog;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -223,6 +225,10 @@ public class IMManager {
      * @param userId  发送消息的好友id
      */
     public void sendFriendMessage(String content, final String userId, final OperateCallBack callBack) {
+        if(TextUtils.isEmpty(content)){
+            callBack.onFailure();
+            return;
+        }
         final EMMessage message = EMMessage.createTxtSendMessage(content, userId);
         message.setChatType(EMMessage.ChatType.Chat);
 
@@ -230,6 +236,7 @@ public class IMManager {
             @Override
             public void onSuccess() {
                 emChatManager.saveMessage(message);
+                EventBus.getDefault().post(new MessageReceivedEvent(null));
                 Log.e(TAG, "send message onSuccess: " + userId);
                 callBack.onSuccess();
             }
@@ -255,7 +262,7 @@ public class IMManager {
 
         List<Chat> result = new ArrayList<>();
         for (EMConversation emConversation : allConversations.values()) {
-            result.add(IMUtils.emConversation2Chat(emConversation, "todo"));
+            result.add(IMUtils.emConversation2Chat(emConversation, emConversation.conversationId()));
         }
         return result;
     }
@@ -279,7 +286,7 @@ public class IMManager {
             } while (temp.size() == 10);
 
             for (EMMessage emMessage : emMessageList) {
-                result.add(IMUtils.emMessage2Message(emMessage, targetId));
+                result.add(IMUtils.emMessage2Message(emMessage));
             }
         }
         return result;
@@ -360,6 +367,10 @@ public class IMManager {
      * @param groupId 发送消息的群组id
      */
     public void sendGroupMessage(String content, String groupId, final OperateCallBack callBack) {
+        if(TextUtils.isEmpty(content)){
+            callBack.onFailure();
+            return;
+        }
         EMMessage message = EMMessage.createTxtSendMessage(content, groupId);
         message.setChatType(EMMessage.ChatType.GroupChat);
 

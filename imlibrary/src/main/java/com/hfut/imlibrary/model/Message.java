@@ -5,14 +5,14 @@ public class Message {
 
     private String authorId;
     private MessageType type;
-    private String targetId;//该消息的目的地是哪里？
+    private String chatId;//该消息所在的会话id
     private String content;
     private long time;
 
-    public Message(String authorId, MessageType type, String targetId, String content, long time) {
+    public Message(String authorId, MessageType type, String chatId, String content, long time) {
         this.authorId = authorId;
         this.type = type;
-        this.targetId = targetId;
+        this.chatId = chatId;
         this.content = content;
         this.time = time;
     }
@@ -25,8 +25,8 @@ public class Message {
         return type;
     }
 
-    public String getTargetId() {
-        return targetId;
+    public String getChatId() {
+        return chatId;
     }
 
     public String getContent() {

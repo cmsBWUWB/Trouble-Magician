@@ -7,6 +7,7 @@ import com.hfut.imlibrary.model.User;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMGroup;
 import com.hyphenate.chat.EMMessage;
+import com.hyphenate.chat.EMTextMessageBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,17 +27,24 @@ public class IMUtils {
         return new Chat(type,
                 emConversation.conversationId(),
                 targetName,
-                emConversation.getLastMessage().getBody().toString());
+                ((EMTextMessageBody)emConversation.getLastMessage().getBody()).getMessage());
     }
 
-    public static Message emMessage2Message(EMMessage emMessage, String targetId) {
+    public static Message emMessage2Message(EMMessage emMessage) {
         Message.MessageType type = emMessage.getChatType() == EMMessage.ChatType.Chat ? Message.MessageType.FRIEND : Message.MessageType.GROUP;
         return new Message(
                 emMessage.getFrom(),
                 type,
-                targetId,
-                emMessage.getBody().toString(),
+                emMessage.conversationId(),
+                ((EMTextMessageBody)emMessage.getBody()).getMessage(),
                 emMessage.getMsgTime());
+    }
+    public static List<Message> emMessageList2MessageList(List<EMMessage> emMessageList){
+        List<Message> messageList = new ArrayList<>();
+        for(EMMessage emMessage:emMessageList){
+            messageList.add(emMessage2Message(emMessage));
+        }
+        return messageList;
     }
 
     public static Group emGroup2Group(EMGroup emGroup) {

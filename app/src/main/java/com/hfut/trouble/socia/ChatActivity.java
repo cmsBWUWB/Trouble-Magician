@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,7 +20,6 @@ import com.hfut.imlibrary.model.Message;
 import com.hfut.trouble.R;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ChatActivity extends BaseActivity {
     @BindView(R.id.lv_chat_message)
@@ -34,14 +36,12 @@ public class ChatActivity extends BaseActivity {
 
     @Override
     public int getLayout() {
-        return 0;
+        return R.layout.activity_chat;
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
-        ButterKnife.bind(this);
 
         Intent intent = getIntent();
         type = (Message.MessageType) intent.getSerializableExtra("type");
@@ -53,6 +53,26 @@ public class ChatActivity extends BaseActivity {
         lvChatMessage.setAdapter(messageAdapter);
         messageAdapter.setData(IMManager.getInstance().getMessageList(targetId));
         lvChatMessage.setSelection(messageAdapter.getCount() - 1);
+
+        etMessage.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(TextUtils.isEmpty(s)){
+                    btSend.setEnabled(false);
+                }else{
+                    btSend.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         //点击按钮则发送消息
         btSend.setOnClickListener(new View.OnClickListener() {
