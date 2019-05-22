@@ -73,25 +73,17 @@ public class GameFragment extends Fragment {
                                     @Override
                                     public void onSuccess() {
                                         super.onSuccess();
-                                        IMManager.getInstance().getGroupFromServer(groupId, new DefaultCallback<Group>() {
-                                            @Override
-                                            public void onSuccess(Group group) {
-                                                Intent intent = new Intent(context, GameRoomActivity.class);
-                                                intent.putExtra(GameRoomActivity.TAG_GROUP, group);
-                                                startActivity(intent);
-                                            }
-
-                                            @Override
-                                            public void onFail(int errorCode, @NotNull String errorMsg) {
-                                                KLog.e("errorMsg = " + errorMsg);
-                                            }
-                                        });
+                                        goToGameRoomActivity(context, groupId);
                                     }
 
                                     @Override
                                     public void onError(int code, String error) {
                                         super.onError(code, error);
-                                        KLog.e("error = " + error);
+                                        if (code == 601) {
+                                            //用户已经加入过该房间，直接跳转到页面
+                                            goToGameRoomActivity(context, groupId);
+                                        }
+                                        KLog.e("code = " + code + ";error = " + error);
                                     }
                                 });
                                 dialog.dismiss();
@@ -108,6 +100,22 @@ public class GameFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private void goToGameRoomActivity(final Context context,final String groupId) {
+        IMManager.getInstance().getGroupFromServer(groupId, new DefaultCallback<Group>() {
+            @Override
+            public void onSuccess(Group group) {
+                Intent intent = new Intent(context, GameRoomActivity.class);
+                intent.putExtra(GameRoomActivity.TAG_GROUP, group);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFail(int errorCode, @NotNull String errorMsg) {
+                KLog.e("errorMsg = " + errorMsg);
+            }
+        });
     }
 
     @Override

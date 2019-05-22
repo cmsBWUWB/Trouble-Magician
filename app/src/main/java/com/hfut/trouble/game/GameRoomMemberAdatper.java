@@ -46,7 +46,7 @@ public class GameRoomMemberAdatper extends BaseAdapter {
         if (convertView != null) {
             viewHolder = (ViewHolder) convertView.getTag();
         } else {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.item_lv_room_member, parent);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.item_lv_room_member, parent, false);
             viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
         }
