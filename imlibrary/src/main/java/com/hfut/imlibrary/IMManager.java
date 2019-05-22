@@ -21,7 +21,6 @@ import com.hyphenate.chat.EMOptions;
 import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -48,13 +47,8 @@ public class IMManager {
     private GroupChangeListener groupChangeListener;
     private FriendChangeListener friendChangeListener;
 
-    /**
-     * bug：存在线程安全的问题
-     */
+
     private User currentLoginUser;
-    private List<Group> groupList;
-    private List<User> friendList;
-    private List<Chat> chatList;
 
 
     private static IMManager instance = new IMManager();
@@ -68,37 +62,18 @@ public class IMManager {
 
     /**
      * 使用前必须先init
-     *
-     * @param context
      */
     public void init(Application context) {
         EMOptions options = new EMOptions();
         emClient = EMClient.getInstance();
         emClient.init(context, options);
-    }
-
-    public void setListener() {
-        messageReceivedListener = new MessageReceivedListener();
-        groupChangeListener = new GroupChangeListener();
-        friendChangeListener = new FriendChangeListener(this.friendList);
-
-        emChatManager.addMessageListener(messageReceivedListener);
-        emGroupManager.addGroupChangeListener(groupChangeListener);
-        emContactManager.setContactListener(friendChangeListener);
-    }
-
-    public void unsetListener() {
-        emChatManager.removeMessageListener(messageReceivedListener);
-        emGroupManager.removeGroupChangeListener(groupChangeListener);
-        emContactManager.removeContactListener(friendChangeListener);
+        onLoginSuccess();
     }
 
     /**
      * 注册
      *
      * @param userName 环信做的限制：必须小写字母
-     * @param password
-     * @return
      */
     public boolean register(String userName, String password) {
         if (TextUtils.isEmpty(userName) || TextUtils.isEmpty(password)) {
@@ -119,9 +94,6 @@ public class IMManager {
 
     /**
      * 登录
-     *
-     * @param userName
-     * @param password
      */
     public void login(final String userName, String password,
                       final OperateCallBack callBack) {
@@ -146,21 +118,6 @@ public class IMManager {
             public void onProgress(int progress, String status) {
             }
         });
-    }
-
-    public void onLoginSuccess() {
-        emChatManager = emClient.chatManager();
-        emGroupManager = emClient.groupManager();
-        emContactManager = emClient.contactManager();
-
-        //登录成功则加载数据
-        currentLoginUser = new User(emClient.getCurrentUser());
-        initData();
-        setListener();
-    }
-
-    private void onLogout() {
-        unsetListener();
     }
 
     /**
@@ -193,6 +150,135 @@ public class IMManager {
         });
     }
 
+    public void onLoginSuccess() {
+        emChatManager = emClient.chatManager();
+        emGroupManager = emClient.groupManager();
+        emContactManager = emClient.contactManager();
+        currentLoginUser = new User(emClient.getCurrentUser(), "");
+        setListener();
+    }
+
+    private void onLogout() {
+        unsetListener();
+    }
+
+    public void setListener() {
+        messageReceivedListener = new MessageReceivedListener();
+        groupChangeListener = new GroupChangeListener();
+        friendChangeListener = new FriendChangeListener();
+
+        emChatManager.addMessageListener(messageReceivedListener);
+        emGroupManager.addGroupChangeListener(groupChangeListener);
+        emContactManager.setContactListener(friendChangeListener);
+    }
+
+    public void unsetListener() {
+        emChatManager.removeMessageListener(messageReceivedListener);
+        emGroupManager.removeGroupChangeListener(groupChangeListener);
+        emContactManager.removeContactListener(friendChangeListener);
+    }
+
+    public User getCurrentLoginUser() {
+        return currentLoginUser;
+    }
+
+    /**
+     * 获取好友列表
+     */
+    public List<User> getFriendListFromNet() {
+        try {
+            friendList = IMUtils.userIdList2UserList(emContactManager.getAllContactsFromServer());
+            return friendList;
+        } catch (HyphenateException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private List<User> friendList;
+
+    public List<User> getFriendListFromLocal() {
+        return friendList;
+    }
+
+    /**
+     * 申请添加好友
+     */
+    public boolean requestAddFriend(String username) {
+        try {
+            emContactManager.addContact(username, "");
+            Log.e(TAG, "requestAddFriend: success");
+            return true;
+        } catch (HyphenateException e) {
+            e.printStackTrace();
+            Log.e(TAG, "requestAddFriend: failed");
+            return false;
+        }
+    }
+
+    /**
+     * 发送好友消息
+     *
+     * @param content 发送消息的内容
+     * @param userId  发送消息的好友id
+     */
+    public void sendFriendMessage(String content, final String userId, final OperateCallBack callBack) {
+        final EMMessage message = EMMessage.createTxtSendMessage(content, userId);
+        message.setChatType(EMMessage.ChatType.Chat);
+
+        message.setMessageStatusCallback(new EMCallBack() {
+            @Override
+            public void onSuccess() {
+                emChatManager.saveMessage(message);
+                Log.e(TAG, "send message onSuccess: " + userId);
+                callBack.onSuccess();
+            }
+
+            @Override
+            public void onError(int code, String error) {
+                callBack.onFailure();
+            }
+
+            @Override
+            public void onProgress(int progress, String status) {
+            }
+        });
+        emChatManager.sendMessage(message);
+    }
+
+    /**
+     * 从本地获取聊天会话列表
+     */
+    public List<Chat> getConversationListFromLocal() {
+        emChatManager.loadAllConversations();
+        Map<String, EMConversation> allConversations = emChatManager.getAllConversations();
+
+        List<Chat> result = new ArrayList<>();
+        for (EMConversation emConversation : allConversations.values()) {
+            result.add(IMUtils.emConversation2Chat(emConversation, "todo"));
+        }
+        return result;
+    }
+
+    /**
+     * 从本地获取聊天记录
+     * @param targetId 群id或者好友id
+     */
+    public List<Message> getMessageListFromLocal(String targetId) {
+        emChatManager.loadAllConversations();
+
+        List<Message> result = new ArrayList<>();
+        EMConversation emConversation = emChatManager.getConversation(targetId);
+        if (emConversation != null) {
+            List<EMMessage> emMessageList = emConversation.getAllMessages();
+            for (EMMessage emMessage : emMessageList) {
+                result.add(IMUtils.emMessage2Message(emMessage, targetId));
+            }
+        }
+        return result;
+    }
+
+
     /**
      * 创建群组
      */
@@ -214,8 +300,6 @@ public class IMManager {
 
     /**
      * 解散群组，只有创建者才能解散群组
-     *
-     * @param groupId
      */
     public boolean destroyGroup(String groupId) {
         try {
@@ -229,8 +313,6 @@ public class IMManager {
 
     /**
      * 申请加入群组
-     *
-     * @param groupId
      */
     public boolean requestJoinGroup(String groupId) {
         try {
@@ -244,8 +326,6 @@ public class IMManager {
 
     /**
      * 退出群组
-     *
-     * @param groupId
      */
     public boolean exitGroup(String groupId) {
         try {
@@ -259,10 +339,6 @@ public class IMManager {
 
     /**
      * 拉人入群
-     *
-     * @param username
-     * @param groupId
-     * @return
      */
     public boolean inviteJoinGroup(String username, String groupId) {
         try {
@@ -276,35 +352,20 @@ public class IMManager {
 
     /**
      * 拉人入群
-     *
-     * @param username
-     * @param groupId
-     * @return
      */
     public boolean inviteJoinGroup(List<String> username, String groupId) {
-        try {
-            emGroupManager.inviteUser(groupId, (String[]) username.toArray(), "");
+        if (username.size() == 0) {
             return true;
-        } catch (HyphenateException e) {
-            e.printStackTrace();
+        }
+        String[] usernameList = (String[]) username.toArray();
+        if (usernameList == null) {
             return false;
         }
-    }
-
-    /**
-     * 申请添加好友
-     *
-     * @param username
-     * @return
-     */
-    public boolean requestAddFriend(String username) {
         try {
-            emContactManager.addContact(username, "");
-            Log.e(TAG, "requestAddFriend: success");
+            emGroupManager.inviteUser(groupId, usernameList, "");
             return true;
         } catch (HyphenateException e) {
             e.printStackTrace();
-            Log.e(TAG, "requestAddFriend: failed");
             return false;
         }
     }
@@ -337,129 +398,17 @@ public class IMManager {
         emChatManager.sendMessage(message);
     }
 
-    /**
-     * 发送好友消息
-     *
-     * @param content  发送消息的内容
-     * @param username 发送消息的好友名
-     */
-    public void sendFriendMessage(String content, String username, final OperateCallBack callBack) {
-        EMMessage message = EMMessage.createTxtSendMessage(content, username);
-        message.setChatType(EMMessage.ChatType.Chat);
 
-        message.setMessageStatusCallback(new EMCallBack() {
-            @Override
-            public void onSuccess() {
-                callBack.onSuccess();
-            }
-
-            @Override
-            public void onError(int code, String error) {
-                callBack.onFailure();
-            }
-
-            @Override
-            public void onProgress(int progress, String status) {
-            }
-        });
-        emChatManager.sendMessage(message);
-    }
-
-
-    public User getCurrentLoginUser() {
-        return this.currentLoginUser;
-    }
-
-    public List<Group> getGroupList() {
-        return new ArrayList<>(this.groupList);
-    }
-
-    public List<User> getFriendList() {
-        return new ArrayList<>(this.friendList);
-    }
-
-    public List<Chat> getChatList() {
-        return new ArrayList<>(this.chatList);
-    }
-
-    /**
-     * 第一次从网络上获取所有数据
-     */
-    private void initData() {
-        friendList = getFriendListFromNet();
-        if (friendList != null) {
-            friendList = Collections.synchronizedList(friendList);
-        }
-        chatList = getConversationList();
-        if (chatList != null) {
-            chatList = Collections.synchronizedList(chatList);
-        }
-        groupList = getGroupListFromNet();
-        if (groupList != null) {
-            groupList = Collections.synchronizedList(groupList);
-        }
-    }
-
-    /**
-     * 从网络上获取好友列表
-     *
-     * @return
-     */
-    private List<User> getFriendListFromNet() {
+    public List<Group> getGroupListFromNet() {
         try {
-            List<String> usernameList = emContactManager.getAllContactsFromServer();
-            List<User> result = new ArrayList<>();
-            for (String username : usernameList) {
-                result.add(new User(username));
-            }
-            return result;
+            return IMUtils.emGroupList2GroupList(emGroupManager.getJoinedGroupsFromServer());
         } catch (HyphenateException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    /**
-     * 获取聊天会话列表
-     *
-     * @return
-     */
-    private List<Chat> getConversationList() {
-        emChatManager.loadAllConversations();
-        Map<String, EMConversation> allConversations = emChatManager.getAllConversations();
-        List<Chat> result = new ArrayList<>();
-        for (EMConversation emConversation : allConversations.values()) {
-            result.add(IMUtils.emConversation2Chat(emConversation));
-        }
-        return result;
-    }
-
-    /**
-     * 从网络上获取用户的群组列表（包括群成员）
-     *
-     * @return
-     */
-    private List<Group> getGroupListFromNet() {
-        try {
-            List<EMGroup> emGroupList = emGroupManager.getJoinedGroupsFromServer();
-            List<Group> groupList = IMUtils.emGroupList2GroupList(emGroupList);
-            for (Group group : groupList) {
-                group.getMembers().addAll(getGroupMemberFromNet(group.getGroupId()));
-            }
-            return groupList;
-        } catch (HyphenateException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * 从网络上获取群组成员列表
-     *
-     * @param groupId
-     * @return
-     */
-    private List<User> getGroupMemberFromNet(String groupId) {
+    public List<User> getGroupMemberFromNet(String groupId) {
         List<User> memberList = new ArrayList<>();
         EMCursorResult<String> result = null;
         final int pageSize = 100;
@@ -473,7 +422,7 @@ public class IMManager {
             }
             if (result == null)
                 break;
-            memberList.addAll(IMUtils.usernameList2UserList(result.getData()));
+            memberList.addAll(IMUtils.userIdList2UserList(result.getData()));
         } while (!TextUtils.isEmpty(result.getCursor()) && result.getData().size() == pageSize);
 
         return memberList;

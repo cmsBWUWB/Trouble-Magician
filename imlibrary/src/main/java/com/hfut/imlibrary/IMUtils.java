@@ -12,26 +12,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IMUtils {
-
-    public static Chat emConversation2Chat(EMConversation emConversation) {
-        List<EMMessage> emMessageList = emConversation.getAllMessages();
-        List<Message> messageList = new ArrayList<>();
-        Chat.ChatType type = emConversation.getType() == EMConversation.EMConversationType.Chat ?
-                Chat.ChatType.FRIEND : Chat.ChatType.GROUP;
-        for (EMMessage emMessage : emMessageList) {
-            messageList.add(emMessage2Message(emMessage));
+    public static List<User> userIdList2UserList(List<String> userIdList) {
+        List<User> userList = new ArrayList<>();
+        for (String userId : userIdList) {
+            userList.add(new User(userId, ""));
         }
+        return userList;
+    }
+
+    public static Chat emConversation2Chat(EMConversation emConversation, String targetName) {
+        Message.MessageType type = emConversation.getType() == EMConversation.EMConversationType.Chat ?
+                Message.MessageType.FRIEND : Message.MessageType.GROUP;
         return new Chat(type,
                 emConversation.conversationId(),
-                emConversation.getLastMessage().getBody().toString(),
-                messageList);
+                targetName,
+                emConversation.getLastMessage().getBody().toString());
+    }
+
+    public static Message emMessage2Message(EMMessage emMessage, String targetId) {
+        Message.MessageType type = emMessage.getChatType() == EMMessage.ChatType.Chat ? Message.MessageType.FRIEND : Message.MessageType.GROUP;
+        return new Message(
+                emMessage.getFrom(),
+                type,
+                targetId,
+                emMessage.getBody().toString(),
+                emMessage.getMsgTime());
     }
 
     public static Group emGroup2Group(EMGroup emGroup) {
         String groupId = emGroup.getGroupId();
         String groupName = emGroup.getGroupName();
-        User owner = new User(emGroup.getOwner());
-        return new Group(groupId, groupName, owner.getUserId(), new ArrayList<User>());
+        User owner = new User(emGroup.getOwner(), "");
+        return new Group(groupId, groupName, owner.getUserId());
     }
 
     public static List<Group> emGroupList2GroupList(List<EMGroup> emGroupList) {
@@ -40,20 +52,5 @@ public class IMUtils {
             groupList.add(emGroup2Group(emGroup));
         }
         return groupList;
-    }
-
-    public static Message emMessage2Message(EMMessage emMessage) {
-        return new Message(
-                emMessage.getFrom(),
-                emMessage.getBody().toString(),
-                emMessage.getMsgTime());
-    }
-
-    public static List<User> usernameList2UserList(List<String> userNameList) {
-        List<User> userList = new ArrayList<>();
-        for (String userName : userNameList) {
-            userList.add(new User(userName));
-        }
-        return userList;
     }
 }

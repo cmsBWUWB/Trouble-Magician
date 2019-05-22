@@ -43,7 +43,6 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onInvitationAccepted(String groupId, String invitee, String reason) {
-        EventBus.getDefault().post(new GroupChangeEvent());
     }
 
     @Override
@@ -63,7 +62,6 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onAutoAcceptInvitationFromGroup(String groupId, String inviter, String inviteMessage) {
-        EventBus.getDefault().post(new GroupChangeEvent());
     }
 
     @Override

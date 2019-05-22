@@ -1,34 +1,31 @@
 package com.hfut.imlibrary.model;
 
-import java.util.List;
-
 public class Chat {
-    public enum ChatType {GROUP, FRIEND}
-    private ChatType chatType;
-    private String target;//好友id或者群名称
-    private String lastMessage;
-    private List<Message> messageList;
+    private Message.MessageType messageType;
+    private String targetId;//好友id或者群id
+    private String targetName;//好友名或者群名
+    private String lastMessage;//最后一条消息
 
-    public Chat(ChatType chatType, String target, String lastMessage, List<Message> messageList) {
-        this.chatType = chatType;
-        this.target = target;
+    public Chat(Message.MessageType messageType, String target, String targetName, String lastMessage) {
+        this.messageType = messageType;
+        this.targetId = target;
+        this.targetName = targetName;
         this.lastMessage = lastMessage;
-        this.messageList = messageList;
     }
 
-    public ChatType getChatType() {
-        return chatType;
+    public Message.MessageType getMessageType() {
+        return messageType;
     }
 
-    public String getTarget() {
-        return target;
+    public String getTargetId() {
+        return targetId;
+    }
+
+    public String getTargetName() {
+        return targetName;
     }
 
     public String getLastMessage() {
         return lastMessage;
-    }
-
-    public List<Message> getMessageList() {
-        return messageList;
     }
 }

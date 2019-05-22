@@ -69,18 +69,6 @@ public class LoginActivity extends BaseActivity {
                             public void run() {
                                 show("登录成功");
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                User user = new User(username);
-                                user.setUsername(username);
-                                user.setPassword(password);
-                                BmobManager.getInstance().saveToServer(user, new SaveListener<String>() {
-                                    @Override
-                                    public void done(String objectId, BmobException e) {
-                                        KLog.i("objectId = " + objectId);
-                                        if (e != null) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                });
                                 finish();
                             }
                         });

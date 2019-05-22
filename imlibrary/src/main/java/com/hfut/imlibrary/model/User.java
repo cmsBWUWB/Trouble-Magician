@@ -1,39 +1,27 @@
 package com.hfut.imlibrary.model;
 
 
-import cn.bmob.v3.BmobObject;
+import android.text.TextUtils;
 
-
-public class User extends BmobObject {
+public class User {
     private String userId;
     private String username;
-    private String password;
 
-    public User(String userId) {
+    public User(String userId, String username) {
         this.userId = userId;
+        this.username = username;
     }
 
     public String getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    @Override
+    public boolean equals(@androidx.annotation.Nullable Object obj) {
+        return obj instanceof User && TextUtils.equals(((User) obj).userId, userId);
     }
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String name) {
-        this.username = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 public class ChatFragment extends Fragment{
     @BindView(R.id.lv_chat)
     ListView lvChatList;
+
     public static ChatFragment newInstance() {
         Bundle args = new Bundle();
 
@@ -34,17 +35,7 @@ public class ChatFragment extends Fragment{
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_socia_chat, container, false);
         ButterKnife.bind(this, v);
-        lvChatList.setAdapter(new ChatListAdapter(inflater));
-        lvChatList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Chat chat = (Chat) lvChatList.getItemAtPosition(position);
-                Intent intent = new Intent(getActivity(), ChatActivity.class);
-                intent.putExtra("type", chat.getChatType());
-                intent.putExtra("target", chat.getTarget());
-                startActivity(intent);
-            }
-        });
+
         return v;
     }
 }

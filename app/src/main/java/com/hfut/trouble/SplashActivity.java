@@ -27,13 +27,10 @@ public class SplashActivity extends BaseActivity {
         BmobManager.getInstance().init(this);
 
         myHandler = new MyHandler(this);
-
         businessRunnable = new BusinessRunnable() {
             @Override
             public void doWorkInRun() {
                 if (IMManager.getInstance().isLogin()) {
-                    //初始化数据
-                    IMManager.getInstance().onLoginSuccess();
                     //启动到MainActivity
                     myHandler.sendEmptyMessage(MyHandler.MAIN_WHAT);
                 } else {

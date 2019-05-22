@@ -6,9 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.model.Chat;
-import com.hfut.imlibrary.model.Message;
 import com.hfut.trouble.R;
 
 import java.util.ArrayList;
@@ -55,9 +53,9 @@ public class ChatListAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        //设置每一行消息的标题与内容，标题就显示对方的用户名或者群名
+        //设置每一行消息的标题与内容，标题就显示对方的用户名或者群名，内容就显示最新的消息
         Chat chat = chatList.get(position);
-        String title = chat.getTarget();
+        String title = chat.getTargetName();
         String lastMessage = chat.getLastMessage();
 
         viewHolder.tvUsername.setText(title);
