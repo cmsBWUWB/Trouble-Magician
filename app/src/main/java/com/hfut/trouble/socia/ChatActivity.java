@@ -47,6 +47,7 @@ public class ChatActivity extends BaseActivity {
         messageAdapter = new MessageAdapter(getLayoutInflater(), currentUserId);
         lvChatMessage.setAdapter(messageAdapter);
         messageAdapter.setData(IMManager.getInstance().getMessageList(targetId));
+        lvChatMessage.setSelection(messageAdapter.getCount() - 1);
 
         //点击按钮则发送消息
         btSend.setOnClickListener(new View.OnClickListener() {
@@ -60,6 +61,7 @@ public class ChatActivity extends BaseActivity {
                             public void run() {
                                 etMessage.setText("");
                                 messageAdapter.setData(IMManager.getInstance().getMessageList(targetId));
+                                lvChatMessage.setSelection(messageAdapter.getCount() - 1);
                             }
                         });
                     }

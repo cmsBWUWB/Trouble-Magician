@@ -67,7 +67,7 @@ public class IMManager {
         EMOptions options = new EMOptions();
         emClient = EMClient.getInstance();
         emClient.init(context, options);
-        if(isLogin()) {
+        if (isLogin()) {
             onLoginSuccess();
         }
     }
@@ -260,6 +260,7 @@ public class IMManager {
 
     /**
      * 从本地获取聊天记录
+     *
      * @param targetId 群id或者好友id
      */
     public List<Message> getMessageList(String targetId) {
@@ -268,6 +269,13 @@ public class IMManager {
         EMConversation emConversation = emChatManager.getConversation(targetId);
         if (emConversation != null) {
             List<EMMessage> emMessageList = emConversation.getAllMessages();
+            List<EMMessage> temp = null;
+            do {
+                String firstMessageId = emMessageList.get(0).getMsgId();
+                temp = emConversation.loadMoreMsgFromDB(firstMessageId, 10);
+                emMessageList.addAll(0, temp);
+            } while (temp.size() == 10);
+
             for (EMMessage emMessage : emMessageList) {
                 result.add(IMUtils.emMessage2Message(emMessage, targetId));
             }
