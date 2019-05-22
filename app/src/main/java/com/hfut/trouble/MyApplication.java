@@ -3,6 +3,8 @@ package com.hfut.trouble;
 import android.app.Application;
 
 import com.hfut.imlibrary.IMManager;
+import com.hfut.utils.utils.Utils;
+import com.socks.library.KLog;
 
 public class MyApplication extends Application {
     @Override
@@ -10,5 +12,7 @@ public class MyApplication extends Application {
         super.onCreate();
         // 初始化 IM 服务
         IMManager.getInstance().init(this);
+        //初始化KLog
+        KLog.init(Utils.isDebuggable(this));
     }
 }

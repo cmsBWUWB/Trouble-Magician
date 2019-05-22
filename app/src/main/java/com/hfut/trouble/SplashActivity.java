@@ -10,7 +10,6 @@ import com.hfut.base.activity.BaseActivity;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
-import com.socks.library.KLog;
 
 import java.lang.ref.WeakReference;
 
@@ -49,7 +48,6 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        KLog.i("wzt","123");
         ThreadDispatcher.getInstance().removeBusinessRunnable(businessRunnable);
     }
 
