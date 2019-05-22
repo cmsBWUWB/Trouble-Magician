@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.hfut.base.fragment.BaseFragment;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.imlibrary.model.Group;
@@ -22,84 +23,85 @@ import com.socks.library.KLog;
 
 import org.jetbrains.annotations.NotNull;
 
-public class GameFragment extends Fragment {
+import butterknife.OnClick;
+
+public class GameFragment extends BaseFragment {
 
     public static GameFragment newInstance() {
         return new GameFragment();
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_game, container, false);
-        view.findViewById(R.id.bt_create_room).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                IMManager.getInstance().createGroup("测试房间", new DefaultCallback<Group>() {
-                    @Override
-                    public void onSuccess(Group group) {
-                        if (group != null) {
-                            Intent intent = new Intent(getActivity(), GameRoomActivity.class);
-                            intent.putExtra(GameRoomActivity.TAG_GROUP, group);
-                            startActivity(intent);
-                        } else {
-                            KLog.e("wzt", "group is null");
-                        }
-                    }
+    public int getLayout() {
+        return R.layout.fragment_game;
+    }
 
-                    @Override
-                    public void onFail(int errorCode, @NotNull String errorMsg) {
-                        KLog.e("errorCode = " + errorCode + "; errorMsg = " + errorMsg);
-                    }
-                });
-            }
-        });
-        view.findViewById(R.id.bt_join_room).setOnClickListener(new View.OnClickListener() {
+    @OnClick(R.id.bt_create_room)
+    void clickCreateRoom(View view) {
+        IMManager.getInstance().createGroup("测试房间", new DefaultCallback<Group>() {
             @Override
-            public void onClick(View v) {
-                Context context = getContext();
-                if (context == null) {
-                    return;
+            public void onSuccess(Group group) {
+                if (group != null) {
+                    Intent intent = new Intent(getActivity(), GameRoomActivity.class);
+                    intent.putExtra(GameRoomActivity.TAG_GROUP, group);
+                    startActivity(intent);
+                } else {
+                    KLog.e("wzt", "group is null");
                 }
-                EditText editText = new EditText(context);
-                new AlertDialog.Builder(context)
-                        .setMessage(R.string.enter_group_hint)
-                        .setView(editText)
-                        .setPositiveButton(R.string.sure, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                final String groupId = editText.getText().toString().trim();
-                                IMManager.getInstance().requestJoinGroup(groupId,new BaseEMCallBack(){
-                                    @Override
-                                    public void onSuccess() {
-                                        super.onSuccess();
-                                        goToGameRoomActivity(context, groupId);
-                                    }
+            }
 
-                                    @Override
-                                    public void onError(int code, String error) {
-                                        super.onError(code, error);
-                                        if (code == 601) {
-                                            //用户已经加入过该房间，直接跳转到页面
-                                            goToGameRoomActivity(context, groupId);
-                                        }
-                                        KLog.e("code = " + code + ";error = " + error);
-                                    }
-                                });
-                                dialog.dismiss();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .create()
-                        .show();
+            @Override
+            public void onFail(int errorCode, @NotNull String errorMsg) {
+                KLog.e("errorCode = " + errorCode + "; errorMsg = " + errorMsg);
             }
         });
-        return view;
+    }
+
+    @OnClick(R.id.bt_join_room)
+    void clickJoinRoom(View view) {
+        Context context = getContext();
+        if (context != null) {
+            showJoinDialog(context);
+        }
+    }
+
+    private void showJoinDialog(final Context context) {
+        EditText editText = new EditText(context);
+        new AlertDialog.Builder(context)
+                .setMessage(R.string.enter_group_hint)
+                .setView(editText)
+                .setPositiveButton(R.string.sure, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final String groupId = editText.getText().toString().trim();
+                        IMManager.getInstance().requestJoinGroup(groupId,new BaseEMCallBack(){
+                            @Override
+                            public void onSuccess() {
+                                super.onSuccess();
+                                goToGameRoomActivity(context, groupId);
+                            }
+
+                            @Override
+                            public void onError(int code, String error) {
+                                super.onError(code, error);
+                                if (code == 601) {
+                                    //用户已经加入过该房间，直接跳转到页面
+                                    goToGameRoomActivity(context, groupId);
+                                }
+                                KLog.e("code = " + code + ";error = " + error);
+                            }
+                        });
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
     }
 
     private void goToGameRoomActivity(final Context context,final String groupId) {

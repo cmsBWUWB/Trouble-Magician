@@ -3,7 +3,9 @@ package com.hfut.trouble.socia;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
-public class GroupFragment extends Fragment {
+import com.hfut.base.fragment.BaseFragment;
+
+public class GroupFragment extends BaseFragment {
     public static GroupFragment newInstance() {
 
         Bundle args = new Bundle();
@@ -11,5 +13,10 @@ public class GroupFragment extends Fragment {
         GroupFragment fragment = new GroupFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public int getLayout() {
+        return 0;
     }
 }

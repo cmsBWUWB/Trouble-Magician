@@ -11,12 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.hfut.base.fragment.BaseFragment;
 import com.hfut.trouble.R;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
-public class SociaFragment extends Fragment {
+public class SociaFragment extends BaseFragment {
     @BindView(R.id.tv_chat)
     public TextView tvChat;
     @BindView(R.id.tv_friend)
@@ -37,12 +37,15 @@ public class SociaFragment extends Fragment {
         return fragment;
     }
 
+    @Override
+    public int getLayout() {
+        return R.layout.fragment_socia;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_socia, container, false);
-        ButterKnife.bind(this, v);
-
+        View v = super.onCreateView(inflater, container, savedInstanceState);
         initViewpager(inflater, v);
         setListener();
         return v;

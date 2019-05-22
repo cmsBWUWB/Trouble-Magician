@@ -2,7 +2,9 @@ package com.hfut.base.activity
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import butterknife.ButterKnife
 import com.hfut.utils.utils.ToastUtils
@@ -12,7 +14,8 @@ import com.hfut.utils.utils.ToastUtils
  *
  */
 abstract class BaseActivity : AppCompatActivity() {
-    abstract fun getLayout():Int
+    abstract fun getLayout(): Int
+    private var dialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,5 +43,22 @@ abstract class BaseActivity : AppCompatActivity() {
             return
         }
         ToastUtils.show(this, message, duration)
+    }
+
+    fun showProgressDialog(messageId: Int) {
+        showProgressDialog(getString(messageId))
+    }
+
+    fun showProgressDialog(message: String) {
+        val progressBar = ProgressBar(this)
+        dialog = AlertDialog.Builder(this)
+                .setView(progressBar)
+                .setMessage(message)
+                .create()
+        dialog?.show()
+    }
+
+    fun dismissProgressDialog(){
+        dialog?.dismiss()
     }
 }

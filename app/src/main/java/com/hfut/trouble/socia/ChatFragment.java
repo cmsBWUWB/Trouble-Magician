@@ -1,24 +1,15 @@
 package com.hfut.trouble.socia;
 
-import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.hfut.imlibrary.model.Chat;
+import com.hfut.base.fragment.BaseFragment;
 import com.hfut.trouble.R;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
-public class ChatFragment extends Fragment{
+public class ChatFragment extends BaseFragment {
     @BindView(R.id.lv_chat)
     ListView lvChatList;
 
@@ -30,12 +21,8 @@ public class ChatFragment extends Fragment{
         return fragment;
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_socia_chat, container, false);
-        ButterKnife.bind(this, v);
-
-        return v;
+    public int getLayout() {
+        return R.layout.fragment_socia_chat;
     }
 }

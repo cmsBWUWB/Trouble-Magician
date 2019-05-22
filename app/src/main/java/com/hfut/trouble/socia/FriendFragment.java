@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.hfut.base.fragment.BaseFragment;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.event.FriendChangeEvent;
 import com.hfut.imlibrary.model.Chat;
@@ -32,7 +33,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class FriendFragment extends Fragment {
+public class FriendFragment extends BaseFragment {
     @BindView(R.id.lv_friend)
     ListView lvFriendList;
     private FriendListAdapter friendListAdapter;
@@ -46,11 +47,15 @@ public class FriendFragment extends Fragment {
         return fragment;
     }
 
+    @Override
+    public int getLayout() {
+        return R.layout.fragment_socia_friend;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_socia_friend, container, false);
-        ButterKnife.bind(this, v);
+        View v = super.onCreateView(inflater, container, savedInstanceState);
 
         friendListAdapter = new FriendListAdapter(inflater);
         lvFriendList.setAdapter(friendListAdapter);
