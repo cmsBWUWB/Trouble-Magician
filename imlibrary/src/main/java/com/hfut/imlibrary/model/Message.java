@@ -3,18 +3,24 @@ package com.hfut.imlibrary.model;
 public class Message {
     public enum MessageType {FRIEND, GROUP}
 
+    private String id;
     private String authorId;
     private MessageType type;
     private String chatId;//该消息所在的会话id
     private String content;
     private long time;
 
-    public Message(String authorId, MessageType type, String chatId, String content, long time) {
+    public Message(String id, String authorId, MessageType type, String chatId, String content, long time) {
+        this.id = id;
         this.authorId = authorId;
         this.type = type;
         this.chatId = chatId;
         this.content = content;
         this.time = time;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getAuthorId() {

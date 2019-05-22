@@ -33,6 +33,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.hfut.trouble.socia.ChatActivity.KEY_TARGET;
+import static com.hfut.trouble.socia.ChatActivity.KEY_TYPE;
+
 public class FriendFragment extends BaseFragment {
     @BindView(R.id.lv_friend)
     ListView lvFriendList;
@@ -65,8 +68,8 @@ public class FriendFragment extends BaseFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String userId = friendListAdapter.getItem(position).getUserId();
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
-                intent.putExtra("type", Message.MessageType.FRIEND);
-                intent.putExtra("target", userId);
+                intent.putExtra(KEY_TYPE, Message.MessageType.FRIEND);
+                intent.putExtra(KEY_TARGET, userId);
                 startActivity(intent);
             }
         });

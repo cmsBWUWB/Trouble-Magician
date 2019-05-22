@@ -24,6 +24,9 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 
+import static com.hfut.trouble.socia.ChatActivity.KEY_TARGET;
+import static com.hfut.trouble.socia.ChatActivity.KEY_TYPE;
+
 public class ChatFragment extends BaseFragment {
     @BindView(R.id.lv_chat)
     ListView lvChatList;
@@ -54,8 +57,8 @@ public class ChatFragment extends BaseFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
-                intent.putExtra("type", chatListAdapter.getItem(position).getMessageType());
-                intent.putExtra("target", chatListAdapter.getItem(position).getTargetId());
+                intent.putExtra(KEY_TYPE, chatListAdapter.getItem(position).getMessageType());
+                intent.putExtra(KEY_TARGET, chatListAdapter.getItem(position).getTargetId());
                 startActivity(intent);
             }
         });

@@ -214,7 +214,7 @@ public class IMManager {
     /**
      * 申请添加好友
      */
-    public void requestAddFriend(String userId,BaseEMCallBack baseEMCallBack) {
+    public void requestAddFriend(String userId, BaseEMCallBack baseEMCallBack) {
         emContactManager.aysncAddContact(userId, "", baseEMCallBack);
     }
 
@@ -225,7 +225,7 @@ public class IMManager {
      * @param userId  发送消息的好友id
      */
     public void sendFriendMessage(String content, final String userId, final OperateCallBack callBack) {
-        if(TextUtils.isEmpty(content)){
+        if (TextUtils.isEmpty(content)) {
             callBack.onFailure();
             return;
         }
@@ -272,19 +272,14 @@ public class IMManager {
      *
      * @param targetId 群id或者好友id
      */
-    public List<Message> getMessageList(String targetId) {
+    public List<Message> getMessageList(String targetId, String msgId, int count) {
         emChatManager.loadAllConversations();
         List<Message> result = new ArrayList<>();
         EMConversation emConversation = emChatManager.getConversation(targetId);
-        if (emConversation != null) {
-            List<EMMessage> emMessageList = emConversation.getAllMessages();
-            List<EMMessage> temp = null;
-            do {
-                String firstMessageId = emMessageList.get(0).getMsgId();
-                temp = emConversation.loadMoreMsgFromDB(firstMessageId, 10);
-                emMessageList.addAll(0, temp);
-            } while (temp.size() == 10);
 
+        if (emConversation != null) {
+            List<EMMessage> emMessageList;
+            emMessageList = emConversation.loadMoreMsgFromDB(msgId, count);
             for (EMMessage emMessage : emMessageList) {
                 result.add(IMUtils.emMessage2Message(emMessage));
             }
@@ -296,7 +291,7 @@ public class IMManager {
      * 创建群组
      */
     public void createGroup(String groupName, @NotNull DefaultCallback<Group> callback) {
-        createGroup(groupName, NUM_GAMEER_DEFAULT,callback);
+        createGroup(groupName, NUM_GAMEER_DEFAULT, callback);
     }
 
     /**
@@ -315,7 +310,7 @@ public class IMManager {
 
             @Override
             public void onError(int error, String errorMsg) {
-                callback.onFail(error,errorMsg);
+                callback.onFail(error, errorMsg);
             }
         });
     }
@@ -331,14 +326,14 @@ public class IMManager {
     /**
      * 申请加入群组
      */
-    public void requestJoinGroup(String groupId,BaseEMCallBack baseEMCallBack) {
+    public void requestJoinGroup(String groupId, BaseEMCallBack baseEMCallBack) {
         emGroupManager.asyncJoinGroup(groupId, baseEMCallBack);
     }
 
     /**
      * 退出群组
      */
-    public void exitGroup(final String groupId,BaseEMCallBack baseEMCallBack) {
+    public void exitGroup(final String groupId, BaseEMCallBack baseEMCallBack) {
         emGroupManager.asyncLeaveGroup(groupId, baseEMCallBack);
     }
 
@@ -352,9 +347,9 @@ public class IMManager {
     /**
      * 拉多人入群
      */
-    public void inviteJoinGroup(List<String> userIdList, String groupId,BaseEMCallBack baseEMCallBack) {
+    public void inviteJoinGroup(List<String> userIdList, String groupId, BaseEMCallBack baseEMCallBack) {
         if (Utils.isListEmpty(userIdList)) {
-            baseEMCallBack.onError(-1,"userIdList is empty");
+            baseEMCallBack.onError(-1, "userIdList is empty");
         }
         String[] usernameList = (String[]) userIdList.toArray();
         emGroupManager.asyncInviteUser(groupId, usernameList, "", baseEMCallBack);
@@ -367,7 +362,7 @@ public class IMManager {
      * @param groupId 发送消息的群组id
      */
     public void sendGroupMessage(String content, String groupId, final OperateCallBack callBack) {
-        if(TextUtils.isEmpty(content)){
+        if (TextUtils.isEmpty(content)) {
             callBack.onFailure();
             return;
         }
@@ -432,7 +427,7 @@ public class IMManager {
     /**
      * 获取群组列表
      */
-    public void getGroupFromServer(final String groupId,final DefaultCallback<Group> callback){
+    public void getGroupFromServer(final String groupId, final DefaultCallback<Group> callback) {
         emGroupManager.asyncGetGroupFromServer(groupId, new EMValueCallBack<EMGroup>() {
             @Override
             public void onSuccess(EMGroup value) {

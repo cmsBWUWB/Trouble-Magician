@@ -33,6 +33,7 @@ public class IMUtils {
     public static Message emMessage2Message(EMMessage emMessage) {
         Message.MessageType type = emMessage.getChatType() == EMMessage.ChatType.Chat ? Message.MessageType.FRIEND : Message.MessageType.GROUP;
         return new Message(
+                emMessage.getMsgId(),
                 emMessage.getFrom(),
                 type,
                 emMessage.conversationId(),

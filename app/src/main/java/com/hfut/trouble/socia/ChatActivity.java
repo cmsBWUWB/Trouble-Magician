@@ -22,6 +22,8 @@ import com.hfut.trouble.R;
 import butterknife.BindView;
 
 public class ChatActivity extends BaseActivity {
+    public static final String KEY_TARGET = "target";
+    public static final String KEY_TYPE = "type";
     @BindView(R.id.lv_chat_message)
     ListView lvChatMessage;
     @BindView(R.id.et_message)
@@ -44,14 +46,14 @@ public class ChatActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        type = (Message.MessageType) intent.getSerializableExtra("type");
-        targetId = intent.getStringExtra("target");
+        type = (Message.MessageType) intent.getSerializableExtra(KEY_TYPE);
+        targetId = intent.getStringExtra(KEY_TARGET);
         currentUserId = IMManager.getInstance().getCurrentLoginUser().getUserId();
 
         //初始化消息列表
         messageAdapter = new MessageAdapter(getLayoutInflater(), currentUserId);
         lvChatMessage.setAdapter(messageAdapter);
-        messageAdapter.setData(IMManager.getInstance().getMessageList(targetId));
+        messageAdapter.setData(IMManager.getInstance().getMessageList(targetId, null, 40));
         lvChatMessage.setSelection(messageAdapter.getCount() - 1);
 
         etMessage.addTextChangedListener(new TextWatcher() {
@@ -85,7 +87,7 @@ public class ChatActivity extends BaseActivity {
                             @Override
                             public void run() {
                                 etMessage.setText("");
-                                messageAdapter.setData(IMManager.getInstance().getMessageList(targetId));
+                                messageAdapter.setData(IMManager.getInstance().getMessageList(targetId, null, 40));
                                 lvChatMessage.setSelection(messageAdapter.getCount() - 1);
                             }
                         });
