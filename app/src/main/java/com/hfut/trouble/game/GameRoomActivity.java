@@ -2,6 +2,7 @@ package com.hfut.trouble.game;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -11,24 +12,34 @@ import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.imlibrary.listener.BaseGroupChangeListener;
 import com.hfut.imlibrary.model.Group;
+import com.hfut.imlibrary.model.User;
 import com.hfut.trouble.R;
+import com.hfut.utils.callbacks.DefaultCallback;
 import com.socks.library.KLog;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 
 /**
  * Created by wzt on 2019/5/22
  * 游戏房间Activity
- * 进入房间生成随机房间id号
  */
 public class GameRoomActivity extends BaseActivity {
     public static String TAG_GROUP = "tag_group";
 
     @BindView(R.id.tv_group_id)
     TextView tvGroupId;
+    @BindView(R.id.lv_room_members)
+    ListView lvRoomMember;
 
     private Group mGroup;
+    private List<User> users = new ArrayList<>();
     private BaseGroupChangeListener mGroupChangeListener;
+    private GameRoomMemberAdatper gameRoomMemberAdatper;
 
     @Override
     public int getLayout() {
@@ -44,8 +55,28 @@ public class GameRoomActivity extends BaseActivity {
         } else {
             final String strGroupId = getString(R.string.id_group, mGroup.getGroupId());
             tvGroupId.setText(strGroupId);
+            gameRoomMemberAdatper = new GameRoomMemberAdatper(this, users);
+            lvRoomMember.setAdapter(gameRoomMemberAdatper);
+            syncGroupMember();
             initListener();
         }
+    }
+
+    private void syncGroupMember() {
+        IMManager.getInstance().getGroupMemberList(mGroup.getGroupId(), new DefaultCallback<List<User>>() {
+            @Override
+            public void onSuccess(List<User> value) {
+                users.clear();
+                users.addAll(value);
+                gameRoomMemberAdatper.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFail(int errorCode, @NotNull String errorMsg) {
+                showToast(errorMsg);
+                KLog.i("code = " + errorCode + ";errorMessage = " + errorMsg);
+            }
+        });
     }
 
     private void initListener() {
@@ -53,12 +84,14 @@ public class GameRoomActivity extends BaseActivity {
             @Override
             public void onRequestToJoinAccepted(String groupId, String groupName, String accepter) {
                 super.onRequestToJoinAccepted(groupId, groupName, accepter);
+                syncGroupMember();
                 KLog.i("wzt", "groupName = " + groupName);
             }
 
             @Override
             public void onInvitationAccepted(String groupId, String invitee, String reason) {
                 super.onInvitationAccepted(groupId, invitee, reason);
+                syncGroupMember();
                 KLog.i("wzt", "groupId = " + groupId);
             }
 

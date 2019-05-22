@@ -399,25 +399,38 @@ public class IMManager {
 
     /**
      * 获取群组的所有成员
+     * 目前最多只拿100个成员，因为我们不会达到这个上限
      */
-    public List<User> getGroupMemberList(String groupId) {
-        List<User> memberList = new ArrayList<>();
-        EMCursorResult<String> result = null;
+    public void getGroupMemberList(final String groupId, final DefaultCallback<List<User>> callback) {
         final int pageSize = 100;
-        //如果群成员较多，需要多次从服务器获取完成
-        do {
-            try {
-                result = emGroupManager.fetchGroupMembers(groupId,
-                        result != null ? result.getCursor() : "", pageSize);
-            } catch (HyphenateException e) {
-                e.printStackTrace();
+        emGroupManager.asyncFetchGroupMembers(groupId, "", pageSize, new EMValueCallBack<EMCursorResult<String>>() {
+            @Override
+            public void onSuccess(EMCursorResult<String> value) {
+                callback.onSuccess(IMUtils.userIdList2UserList(value.getData()));
             }
-            if (result == null)
-                break;
-            memberList.addAll(IMUtils.userIdList2UserList(result.getData()));
-        } while (!TextUtils.isEmpty(result.getCursor()) && result.getData().size() == pageSize);
 
-        return memberList;
+            @Override
+            public void onError(int error, String errorMsg) {
+                callback.onFail(error, errorMsg);
+            }
+        });
+    }
+
+    /**
+     * 获取群组列表
+     */
+    public void getGroupFromServer(final String groupId,final DefaultCallback<Group> callback){
+        emGroupManager.asyncGetGroupFromServer(groupId, new EMValueCallBack<EMGroup>() {
+            @Override
+            public void onSuccess(EMGroup value) {
+                callback.onSuccess(IMUtils.emGroup2Group(value));
+            }
+
+            @Override
+            public void onError(int error, String errorMsg) {
+                callback.onFail(error, errorMsg);
+            }
+        });
     }
 
     public void addGroupChangeListener(BaseGroupChangeListener baseGroupChangeListener) {

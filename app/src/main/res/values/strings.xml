@@ -23,4 +23,5 @@
     <string name="exit_group_fail">退出房间失败</string>
     <string name="destroy_group_success">解散房间成功</string>
     <string name="destroy_group_fail">解散房间失败</string>
+    <string name="enter_group_hint">请输入房间号</string>
 </resources>

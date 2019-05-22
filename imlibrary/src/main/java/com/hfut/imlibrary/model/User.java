@@ -3,6 +3,8 @@ package com.hfut.imlibrary.model;
 
 import android.text.TextUtils;
 
+import org.jetbrains.annotations.Nullable;
+
 public class User {
     private String userId;
     private String username;
@@ -17,7 +19,7 @@ public class User {
     }
 
     @Override
-    public boolean equals(@androidx.annotation.Nullable Object obj) {
+    public boolean equals(@Nullable Object obj) {
         return obj instanceof User && TextUtils.equals(((User) obj).userId, userId);
     }
 
