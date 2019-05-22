@@ -68,7 +68,12 @@ public class GameRoomActivity extends BaseActivity {
             public void onSuccess(List<User> value) {
                 users.clear();
                 users.addAll(value);
-                gameRoomMemberAdatper.notifyDataSetChanged();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        gameRoomMemberAdatper.notifyDataSetChanged();
+                    }
+                });
             }
 
             @Override
