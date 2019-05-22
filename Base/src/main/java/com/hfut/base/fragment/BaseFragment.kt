@@ -21,9 +21,12 @@ abstract class BaseFragment : Fragment() {
     private var dialog: AlertDialog? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(getLayout(), container, false)
-        ButterKnife.bind(this,view)
-        return view?.let { it }
+        if(getLayout() > 0){
+            val view = inflater.inflate(getLayout(), container, false)
+            ButterKnife.bind(this,view)
+            return view
+        }
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     fun showToast(resId: Int) {
