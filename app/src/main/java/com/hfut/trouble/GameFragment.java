@@ -46,7 +46,7 @@ public class GameFragment extends BaseFragment {
                     intent.putExtra(GameRoomActivity.TAG_GROUP, group);
                     startActivity(intent);
                 } else {
-                    KLog.e("wzt", "group is null");
+                    KLog.e("group is null");
                 }
             }
 
