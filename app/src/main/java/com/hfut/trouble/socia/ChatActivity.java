@@ -33,6 +33,11 @@ public class ChatActivity extends BaseActivity {
     String currentUserId;
 
     @Override
+    public int getLayout() {
+        return 0;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);

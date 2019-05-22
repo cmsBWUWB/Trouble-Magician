@@ -1,6 +1,9 @@
 package com.hfut.imlibrary.model;
 
-public class Group {
+import java.io.Serializable;
+import java.util.List;
+
+public class Group implements Serializable {
     private String groupId;
     private String groupName;
     private String ownerUserId;

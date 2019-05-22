@@ -4,10 +4,14 @@ import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.hfut.imlibrary.listener.BaseGroupChangeListener;
 import com.hfut.imlibrary.listener.FriendChangeListener;
 import com.hfut.imlibrary.listener.GroupChangeListener;
 import com.hfut.imlibrary.listener.MessageReceivedListener;
 import com.hfut.imlibrary.model.*;
+import com.hfut.utils.callbacks.DefaultCallback;
+import com.hfut.utils.thread.BusinessRunnable;
+import com.hfut.utils.thread.ThreadDispatcher;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMChatManager;
 import com.hyphenate.chat.EMClient;
@@ -19,8 +23,12 @@ import com.hyphenate.chat.EMGroupManager;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.exceptions.HyphenateException;
+import com.socks.library.KLog;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +46,7 @@ import java.util.Map;
  */
 public class IMManager {
     private static final String TAG = "IMManager";
+    private static final int NUM_GAMEER_DEFAULT = 5;
     private EMClient emClient;
     private EMChatManager emChatManager;
     private EMGroupManager emGroupManager;
@@ -286,32 +295,49 @@ public class IMManager {
     /**
      * 创建群组
      */
-    public Group createGroup(String groupName) {
-        EMGroupManager.EMGroupOptions options = new EMGroupManager.EMGroupOptions();
-        //设置创建的群组所有人都可以无条件加入
-        options.style = EMGroupManager.EMGroupStyle.EMGroupStylePublicOpenJoin;
-        try {
-            EMGroup emGroup = emGroupManager.createGroup(groupName, "",
-                    new String[]{}, "", options);
-            return IMUtils.emGroup2Group(emGroup);
-        } catch (HyphenateException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public void createGroup(String groupName, @NotNull DefaultCallback<Group> callback) {
+        createGroup(groupName, NUM_GAMEER_DEFAULT,callback);
+    }
+
+    /**
+     * 创建群组
+     */
+    public void createGroup(final String groupName, final int maxUsers, @NotNull final DefaultCallback<Group> callback) {
+        ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
+            @Override
+            public void doWorkInRun() {
+                EMGroupManager.EMGroupOptions options = new EMGroupManager.EMGroupOptions();
+                options.maxUsers = maxUsers;
+                //设置创建的群组所有人都可以无条件加入
+                options.style = EMGroupManager.EMGroupStyle.EMGroupStylePublicOpenJoin;
+                try {
+                    EMGroup emGroup = emGroupManager.createGroup(groupName, "",
+                            new String[]{}, "", options);
+                    callback.onSuccess(IMUtils.emGroup2Group(emGroup));
+                } catch (HyphenateException e) {
+                    e.printStackTrace();
+                    callback.onFail(-1, "");
+                }
+            }
+        });
     }
 
 
     /**
      * 解散群组，只有创建者才能解散群组
      */
-    public boolean destroyGroup(String groupId) {
-        try {
-            emGroupManager.destroyGroup(groupId);
-            return true;
-        } catch (HyphenateException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public void destroyGroup(final String groupId) {
+        ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
+            @Override
+            public void doWorkInRun() {
+                try {
+                    emGroupManager.destroyGroup(groupId);
+                } catch (HyphenateException e) {
+                    KLog.e("groupId = " + groupId + "; destroy group failed!");
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
@@ -330,14 +356,18 @@ public class IMManager {
     /**
      * 退出群组
      */
-    public boolean exitGroup(String groupId) {
-        try {
-            emGroupManager.leaveGroup(groupId);
-            return true;
-        } catch (HyphenateException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public void exitGroup(final String groupId) {
+        ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
+            @Override
+            public void doWorkInRun() {
+                try {
+                    emGroupManager.leaveGroup(groupId);
+                } catch (HyphenateException e) {
+                    KLog.e("groupId = " + groupId + "; exit group failed!");
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
@@ -435,5 +465,17 @@ public class IMManager {
         } while (!TextUtils.isEmpty(result.getCursor()) && result.getData().size() == pageSize);
 
         return memberList;
+    }
+
+    public void addGroupChangeListener(BaseGroupChangeListener baseGroupChangeListener) {
+        if (groupChangeListener != null) {
+            groupChangeListener.addListener(baseGroupChangeListener);
+        }
+    }
+
+    public void removeGroupChangeListener(BaseGroupChangeListener baseGroupChangeListener) {
+        if (emGroupManager != null) {
+            groupChangeListener.removeListener(baseGroupChangeListener);
+        }
     }
 }

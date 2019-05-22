@@ -1,7 +1,6 @@
 package com.hfut.trouble;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +17,6 @@ import com.hfut.utils.utils.ToastUtils;
 import com.socks.library.KLog;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 import xiaoma.com.bomb.BmobManager;
@@ -34,11 +32,10 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.bt_register)
     public Button btRegister;
 
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
+    public int getLayout() {
+        return R.layout.activity_login;
     }
 
     public void onclick(View v) {

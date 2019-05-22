@@ -20,9 +20,13 @@ public class SplashActivity extends BaseActivity {
     private BusinessRunnable businessRunnable;
 
     @Override
+    public int getLayout() {
+        return R.layout.activity_splash;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
         //初始化Bmob服务
         BmobManager.getInstance().init(this);
 

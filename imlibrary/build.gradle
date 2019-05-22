@@ -25,11 +25,12 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.hyphenate:hyphenate-sdk-lite:3.3.0'
+    api 'com.hyphenate:hyphenate-sdk-lite:3.3.0'
     implementation 'org.greenrobot:eventbus:3.1.1'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(':Bmob')
+    implementation project(':Utils')
     implementation 'androidx.annotation:annotation:1.0.2'
 }
 repositories {

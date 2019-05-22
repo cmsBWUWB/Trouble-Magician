@@ -1,6 +1,7 @@
 package com.hfut.trouble;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +13,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hfut.base.activity.BaseActivity;
 import com.hfut.imlibrary.IMManager;
+import com.hfut.imlibrary.model.Group;
+import com.hfut.trouble.game.GameRoomActivity;
 import com.hfut.trouble.socia.SociaFragment;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
@@ -20,8 +24,9 @@ import com.hfut.utils.utils.ToastUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @BindView(R.id.tv_game)
     public TextView tvGame;
@@ -35,10 +40,13 @@ public class MainActivity extends AppCompatActivity {
     ProfileFragment profileFragment;
 
     @Override
+    public int getLayout() {
+        return R.layout.activity_main;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
 
         gameFragment = GameFragment.newInstance();
         sociaFragment = SociaFragment.newInstance();
