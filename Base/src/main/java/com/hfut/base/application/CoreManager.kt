@@ -18,8 +18,8 @@ class CoreManager {
         }
 
         @JvmStatic
-        fun getContext(): Context? {
-            return appContext
+        fun getContext(): Context {
+            return appContext!!
         }
     }
 }
