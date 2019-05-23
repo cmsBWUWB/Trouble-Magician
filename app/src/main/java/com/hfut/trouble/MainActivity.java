@@ -1,10 +1,8 @@
 package com.hfut.trouble;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,6 +13,7 @@ import android.widget.TextView;
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
+import com.hfut.trouble.profile.ProfileFragment;
 import com.hfut.trouble.socia.SociaFragment;
 import com.socks.library.KLog;
 
