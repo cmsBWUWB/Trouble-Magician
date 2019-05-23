@@ -7,6 +7,7 @@ import android.os.Message;
 import androidx.annotation.Nullable;
 
 import com.hfut.base.activity.BaseActivity;
+import com.hfut.base.activity.PermissionActivity;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
@@ -15,7 +16,7 @@ import java.lang.ref.WeakReference;
 
 import xiaoma.com.bomb.BmobManager;
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends PermissionActivity {
     private MyHandler myHandler;
     private BusinessRunnable businessRunnable;
 
@@ -25,11 +26,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //初始化Bmob服务
-        BmobManager.getInstance().init(this);
-
+    public void onPermissionAccept() {
         myHandler = new MyHandler(this);
         businessRunnable = new BusinessRunnable() {
             @Override
@@ -44,6 +41,13 @@ public class SplashActivity extends BaseActivity {
             }
         };
         ThreadDispatcher.getInstance().postBusinessRunnableDelayed(businessRunnable, 1000);
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //初始化Bmob服务
+        BmobManager.getInstance().init(this);
     }
 
     @Override
