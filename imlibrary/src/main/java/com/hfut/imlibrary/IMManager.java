@@ -140,31 +140,8 @@ public class IMManager {
     /**
      * 登出
      */
-    public void logout(final OperateCallBack callBack) {
-        if (!emClient.isLoggedInBefore()) {
-            //如果未登录过或者已经注销了
-            if (callBack != null)
-                callBack.onSuccess();
-            return;
-        }
-        emClient.logout(true, new EMCallBack() {
-            @Override
-            public void onSuccess() {
-                onLogout();
-                if (callBack != null)
-                    callBack.onSuccess();
-            }
-
-            @Override
-            public void onError(int code, String error) {
-                if (callBack != null)
-                    callBack.onFailure();
-            }
-
-            @Override
-            public void onProgress(int progress, String status) {
-            }
-        });
+    public void logout(final BaseEMCallBack callBack) {
+        emClient.logout(true,callBack);
     }
 
     private void onLoginSuccess() {
