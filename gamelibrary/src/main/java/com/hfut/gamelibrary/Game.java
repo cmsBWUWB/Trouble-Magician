@@ -123,7 +123,7 @@ public class Game {
                     break;
                 default:
                     currentPlayer.changeBlood(-1);
-                    if(currentPlayer.blood == 0){
+                    if (currentPlayer.blood == 0) {
                         loser.add(currentPlayer);
                         gameTurnOver();
                         return;
@@ -198,12 +198,12 @@ public class Game {
                     break;
             }
             //判断有谁血量为0
-            for(Player player:playerList){
-                if(player.blood == 0){
+            for (Player player : playerList) {
+                if (player.blood == 0) {
                     loser.add(player);
                 }
             }
-            if(!loser.isEmpty()){
+            if (!loser.isEmpty()) {
                 turnWinner = currentPlayer;
                 gameTurnOver();
                 return;
@@ -233,6 +233,34 @@ public class Game {
     //一轮游戏结束
     private void gameTurnOver() {
         nextStep = STEP.START_NEW_TURN;
+        if (turnWinner != null) {
+            if (!loser.isEmpty()) {
+                //1. 有loser，有winner
+                for (Player player : playerList) {
+                    if (player.equals(turnWinner)) {
+                        //赢家加三分
+                        player.point += 3 + player.secretCard.size();
+                    } else if (loser.indexOf(player) == -1) {
+                        //其他存活的玩家加一分
+                        player.point += 1 + player.secretCard.size();
+                    }
+                }
+            } else {
+                //2. 没loser，有winner
+                //赢家加三分，其他人不加分
+                turnWinner.point += 3 + turnWinner.secretCard.size();
+            }
+
+        } else {
+            //3. 有loser，没winner
+            for (Player player : playerList) {
+                if (loser.indexOf(player) == -1) {
+                    //除了输家，其他人都加一分
+                    player.point += 1 + player.secretCard.size();
+                }
+            }
+        }
+        //判断是否有人达到了8分以上，如果达到，则游戏结束。
         for (Player player : playerList) {
             if (player.point >= 8) {
                 gameWinner = player;
@@ -270,7 +298,7 @@ public class Game {
                     nextStep = STEP.CURRENT_PLAYER_DO_MAGIC_OR_PASS;
                 } else {
                     currentPlayer.changeBlood(-1 * currentSession.dice);
-                    if(currentPlayer.blood == 0){
+                    if (currentPlayer.blood == 0) {
                         loser.add(currentPlayer);
                         gameTurnOver();
                         return;
