@@ -69,8 +69,7 @@ public class Game {
 
     private Player currentPlayer;//现在游戏是谁的回合？？
     private Session currentSession;
-    private Session lastSession;
-    private STEP nextStep;
+    private STEP nextStep;//游戏的下一步是什么？
 
     /**
      * 初始化游戏
@@ -94,6 +93,14 @@ public class Game {
         return currentPlayer.userId;
     }
 
+    public List<String> getPlayList() {
+        List<String> userIdList = new ArrayList<>();
+        for (Player player : playerList) {
+            userIdList.add(player.userId);
+        }
+        return userIdList;
+    }
+
     /**
      * 获取游戏的下一步是什么？
      * 1. 当前玩家施放魔法
@@ -108,7 +115,9 @@ public class Game {
     /**
      * 施放魔法
      */
-    public void doMagic(Card magic) {
+    public boolean doMagic(Card magic) {
+        currentSession = new Session();
+
         currentSession.whichMagicList = magic;
 
         //判断当前玩家是否有该魔法
@@ -126,12 +135,13 @@ public class Game {
                     if (currentPlayer.blood == 0) {
                         loser.add(currentPlayer);
                         gameTurnOver();
-                        return;
+                        return false;
                     }
                     //下一个玩家
                     nextPlayer();
                     break;
             }
+            return false;
         } else {
             //释放魔法成功
             currentSession.doMagicSuccess = true;
@@ -141,7 +151,7 @@ public class Game {
                 //本轮游戏结束
                 turnWinner = currentPlayer;
                 gameTurnOver();
-                return;
+                return true;
             }
 
             switch (magic) {
@@ -206,8 +216,9 @@ public class Game {
             if (!loser.isEmpty()) {
                 turnWinner = currentPlayer;
                 gameTurnOver();
-                return;
+                return true;
             }
+            return true;
         }
     }
 
@@ -226,8 +237,6 @@ public class Game {
         currentPlayerIndex++;
         currentPlayerIndex %= playerList.size();
         currentPlayer = playerList.get(currentPlayerIndex);
-        lastSession = currentSession;
-        currentSession = new Session();
     }
 
     //一轮游戏结束
@@ -285,7 +294,7 @@ public class Game {
     /**
      * 掷骰子
      */
-    public void doThrowDice() {
+    public int doThrowDice() {
         currentSession.dice = getDice();
 
         switch (currentSession.whichMagicList) {
@@ -301,7 +310,7 @@ public class Game {
                     if (currentPlayer.blood == 0) {
                         loser.add(currentPlayer);
                         gameTurnOver();
-                        return;
+                        return currentSession.dice;
                     }
                     nextPlayer();
                 }
@@ -311,6 +320,7 @@ public class Game {
                 nextStep = STEP.CURRENT_PLAYER_DO_MAGIC_OR_PASS;
                 break;
         }
+        return currentSession.dice;
     }
 
     /**
