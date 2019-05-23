@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Base</string>
+    <string name="take_photo">拍照</string>
+    <string name="choose_photo">本地</string>
 </resources>

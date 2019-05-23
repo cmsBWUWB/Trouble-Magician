@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="divider_height">0.5dp</dimen>
+    <dimen name="dialog_bottom_item_height">50dp</dimen>
+    <dimen name="dialog_bottom_item_interval">10dp</dimen>
+</resources>
