@@ -53,7 +53,9 @@ public class SplashActivity extends PermissionActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ThreadDispatcher.getInstance().removeBusinessRunnable(businessRunnable);
+        if(businessRunnable != null) {
+            ThreadDispatcher.getInstance().removeBusinessRunnable(businessRunnable);
+        }
     }
 
     private static class MyHandler extends Handler {

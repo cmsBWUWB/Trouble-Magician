@@ -3,6 +3,7 @@ package com.hfut.trouble.profile;
 import android.app.Activity;
 import android.content.Intent;
 
+import android.util.Log;
 import android.view.View;
 
 import com.hfut.base.fragment.BaseFragment;
@@ -25,7 +26,7 @@ public class ProfileFragment extends BaseFragment {
         return R.layout.fragment_profile;
     }
 
-    @OnClick
+    @OnClick(R.id.bt_logout)
     void logout(View view){
         IMManager.getInstance().logout(new BaseEMCallBack(){
             @Override
@@ -33,8 +34,8 @@ public class ProfileFragment extends BaseFragment {
                 super.onSuccess();
                 Activity activity = getActivity();
                 if (activity != null) {
-                    activity.finish();
                     startActivity(new Intent(activity, LoginActivity.class));
+                    activity.finish();
                 }
             }
 
