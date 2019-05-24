@@ -149,11 +149,14 @@ public class IMManager {
         emGroupManager = emClient.groupManager();
         emContactManager = emClient.contactManager();
         currentLoginUser = new User(emClient.getCurrentUser(), "");
+        UserManager.INSTANCE.setCurrentUser(currentLoginUser);
         setListener();
     }
 
     private void onLogout() {
         unsetListener();
+        UserManager.INSTANCE.setCurrentUser(null);
+        currentLoginUser = null;
     }
 
     private void setListener() {

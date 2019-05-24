@@ -27,6 +27,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$ANDROID_X_VERSION"
 
     implementation project(path: ':imlibrary')
+    implementation project(path: ':Bmob')
     implementation 'org.greenrobot:eventbus:3.1.1'
     compile project(path: ':Utils')
 

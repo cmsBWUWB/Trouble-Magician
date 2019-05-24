@@ -12,21 +12,29 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.hfut.base.application.CoreManager;
 import com.hfut.base.dialog.CameraHandler;
 import com.hfut.base.fragment.BaseFragment;
 import com.hfut.base.model.CameraImageBean;
 import com.hfut.base.model.RequestCodes;
 import com.hfut.imlibrary.IMManager;
+import com.hfut.imlibrary.UserManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.trouble.LoginActivity;
 import com.hfut.trouble.R;
+import com.hfut.utils.callbacks.DefaultCallback;
+import com.hfut.utils.utils.FileUtils;
 import com.socks.library.KLog;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.net.URI;
+
 import butterknife.BindView;
 import butterknife.OnClick;
+import xiaoma.com.bomb.BmobManager;
 
 public class ProfileFragment extends BaseFragment {
 
@@ -52,7 +60,7 @@ public class ProfileFragment extends BaseFragment {
 
     private void initHead() {
         Glide.with(this)
-                .load("http://bmob-cdn-23873.b0.upaiyun.com/2019/05/23/5d575279400fc06d80a406ef63f3ad04.png")
+                .load(UserManager.INSTANCE.getUserIcon())
                 .transform(new CircleCrop())
                 .error(R.drawable.icon_default_head)
                 .into(iv_head);
@@ -89,22 +97,64 @@ public class ProfileFragment extends BaseFragment {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case RequestCodes.TAKE_PHOTO:
-                Glide.with(this)
-                        .load(CameraImageBean.INSTANCE.getPath())
-                        .transform(new CircleCrop())
-                        .error(R.drawable.icon_default_head)
-                        .into(iv_head);
+                final Uri uri = CameraImageBean.INSTANCE.getPath();
+                if (uri == null) {
+                    KLog.e("uri is null!");
+                    return;
+                }
+                uploadFileToServer(uri);
                 break;
             case RequestCodes.PICK_PHOTO:
-                final Uri pickPath = data.getData();
-                Glide.with(this)
-                        .load(pickPath)
-                        .transform(new CircleCrop())
-                        .error(R.drawable.icon_default_head)
-                        .into(iv_head);
+                //这里的uri是content开头，需要解析成file开头的才可以正常使用
+                final Uri pickUri = data.getData();
+                if (pickUri == null) {
+                    KLog.e("uri is null!");
+                    return;
+                }
+                uploadFileToServer(pickUri);
                 break;
             default:
                 break;
         }
+    }
+
+    private void uploadFileToServer(Uri uri) {
+        final String filePath = FileUtils.getFilePathByUri(CoreManager.getContext(), uri);
+        if (filePath == null) {
+            KLog.e("filePath is null");
+            return;
+        }
+        File file = new File(filePath);
+        BmobManager.getInstance().uploadFile(file, new DefaultCallback<String>() {
+            @Override
+            public void onSuccess(String value) {
+                //上传成功之后，把User的数据更新
+                UserManager.INSTANCE.uploadUserIcon(value, new DefaultCallback<Object>() {
+
+                    @Override
+                    public void onFail(int errorCode, @NotNull String errorMsg) {
+                        //更新头像失败
+                        KLog.e("errorCode = " + errorCode);
+                        showToast(errorMsg);
+                    }
+
+                    @Override
+                    public void onSuccess(Object value) {
+                        //更新头像成功
+                        showToast(R.string.update_head_success);
+                        Glide.with(ProfileFragment.this)
+                                .load(file)
+                                .transform(new CircleCrop())
+                                .error(R.drawable.icon_default_head)
+                                .into(iv_head);
+                    }
+                });
+            }
+
+            @Override
+            public void onFail(int errorCode, @NotNull String errorMsg) {
+                showToast(errorMsg);
+            }
+        });
     }
 }

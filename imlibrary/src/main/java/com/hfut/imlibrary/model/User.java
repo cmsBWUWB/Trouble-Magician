@@ -5,9 +5,12 @@ import android.text.TextUtils;
 
 import org.jetbrains.annotations.Nullable;
 
-public class User {
+import cn.bmob.v3.BmobObject;
+
+public class User extends BmobObject {
     private String userId;
     private String username;
+    private String picPath;
 
     public User(String userId, String username) {
         this.userId = userId;
@@ -25,5 +28,13 @@ public class User {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getPicPath() {
+        return picPath;
+    }
+
+    public void setPicPath(String picPath) {
+        this.picPath = picPath;
     }
 }
