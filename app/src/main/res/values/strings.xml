@@ -24,4 +24,7 @@
     <string name="destroy_group_success">解散房间成功</string>
     <string name="destroy_group_fail">解散房间失败</string>
     <string name="enter_group_hint">请输入房间号</string>
+    <string name="pass">跳过</string>
+    <string name="throw_dice">掷骰子</string>
+    <string name="do_magic">施放魔法</string>
 </resources>

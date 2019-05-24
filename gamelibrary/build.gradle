@@ -28,5 +28,6 @@ dependencies {
 
     implementation project(path: ':imlibrary')
     implementation 'org.greenrobot:eventbus:3.1.1'
+    compile project(path: ':Utils')
 
 }
