@@ -29,24 +29,33 @@ public class GameManager {
         void showGame(Game game);
     }
 
-    public static final String TYPE_DICE = "dice:";
-    public static final String TYPE_MAGIC = "magic:";
-    public static final String TYPE_PASS = "pass:";
+    public static final String TYPE_DICE = "dice";
+    public static final String TYPE_MAGIC = "magic";
+    public static final String TYPE_PASS = "pass";
 
 
     private ShowMe showMe;
     private Game game;
     private Group group;
+    private String[] userIdList;
 
     public void init(Group group, String[] userIdList, ShowMe showMe) {
-        String currentUserId = IMManager.getInstance().getCurrentLoginUser().getUserId();
         this.group = group;
+        this.userIdList = userIdList;
         this.showMe = showMe;
+        game = new Game();
+        game.init(userIdList);
 
+        newTurn();
+
+        EventBus.getDefault().register(this);
+    }
+
+    public void newTurn() {
+        String currentUserId = IMManager.getInstance().getCurrentLoginUser().getUserId();
         if (currentUserId.equals(group.getOwnerUserId())) {
-            //如果自己是房主，则要初始化游戏，并发送给所有人
-            game = new Game();
-            game.start(userIdList);
+            //如果自己是房主，则要发牌，并发送给所有人
+            game.newTurn();
             showMe.showGame(game);
             ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
                 @Override
@@ -67,12 +76,12 @@ public class GameManager {
                 }
             });
         }
-        EventBus.getDefault().register(this);
     }
 
     public void exit() {
         EventBus.getDefault().unregister(this);
         this.showMe = null;
+        this.game = null;
     }
 
     public void doMagic(final Game.Card card) {
@@ -83,7 +92,7 @@ public class GameManager {
         ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
             @Override
             public void doWorkInRun() {
-                IMManager.getInstance().sendGroupMessage(TYPE_MAGIC + card.toString(), group.getGroupId(), new OperateCallBack() {
+                IMManager.getInstance().sendGroupMessage(TYPE_MAGIC + ":" + card.toString(), group.getGroupId(), new OperateCallBack() {
                     @Override
                     public void onSuccess() {
                     }
@@ -104,7 +113,7 @@ public class GameManager {
         ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
             @Override
             public void doWorkInRun() {
-                IMManager.getInstance().sendGroupMessage(TYPE_DICE + dice, group.getGroupId(), new OperateCallBack() {
+                IMManager.getInstance().sendGroupMessage(TYPE_DICE + ":" + dice, group.getGroupId(), new OperateCallBack() {
                     @Override
                     public void onSuccess() {
                     }
@@ -117,6 +126,15 @@ public class GameManager {
         });
     }
 
+    public int getDice() {
+        return game.getDice();
+    }
+
+    public void nextRound() {
+        game.nextRound();
+        showMe.showGame(game);
+    }
+
     public void pass() {
         game.pass();
         showMe.showGame(game);
@@ -125,7 +143,7 @@ public class GameManager {
         ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
             @Override
             public void doWorkInRun() {
-                IMManager.getInstance().sendGroupMessage(TYPE_PASS, group.getGroupId(), new OperateCallBack() {
+                IMManager.getInstance().sendGroupMessage(TYPE_PASS + ":", group.getGroupId(), new OperateCallBack() {
                     @Override
                     public void onSuccess() {
                     }
@@ -145,7 +163,7 @@ public class GameManager {
             if (message.getChatId().equals(group.getGroupId())) {
                 //该群来消息了，做些什么？
                 //如果是第一次房主的游戏初始化，更新界面
-                if (game == null && message.getAuthorId().equals(group.getOwnerUserId())) {
+                if ((game.getStatus() == Game.STATUS.GAME_INITED || game.getStatus() == Game.STATUS.TURN_ENDED) && message.getAuthorId().equals(group.getOwnerUserId())) {
                     try {
                         game = Game.toGame(message.getContent());
                         showMe.showGame(game);

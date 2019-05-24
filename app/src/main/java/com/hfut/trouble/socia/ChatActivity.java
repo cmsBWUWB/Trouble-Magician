@@ -16,8 +16,13 @@ import android.widget.Toast;
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
+import com.hfut.imlibrary.event.MessageReceivedEvent;
 import com.hfut.imlibrary.model.Message;
 import com.hfut.trouble.R;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 
@@ -101,5 +106,17 @@ public class ChatActivity extends BaseActivity {
             }
         });
 
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
+    public void onMessageReceivedEvent(MessageReceivedEvent event){
+        messageAdapter.setData(IMManager.getInstance().getMessageList(targetId, null, 40));
+        lvChatMessage.setSelection(messageAdapter.getCount() - 1);
     }
 }

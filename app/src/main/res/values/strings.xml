@@ -27,4 +27,5 @@
     <string name="pass">跳过</string>
     <string name="throw_dice">掷骰子</string>
     <string name="do_magic">施放魔法</string>
+    <string name="start_game">开始游戏</string>
 </resources>

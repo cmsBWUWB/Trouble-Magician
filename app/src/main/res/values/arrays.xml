@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_magic_list" >
+        <item>古代巨龙</item>
+        <item>黑暗幽灵</item>
+        <item>甜蜜的梦</item>
+        <item>猫头鹰</item>
+        <item>闪电暴风雨</item>
+        <item>暴风雪</item>
+        <item>火球术</item>
+        <item>魔法药水</item>
+    </string-array>
+</resources>

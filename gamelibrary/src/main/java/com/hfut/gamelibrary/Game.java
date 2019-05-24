@@ -1,5 +1,7 @@
 package com.hfut.gamelibrary;
 
+import android.util.Base64;
+
 import androidx.annotation.Nullable;
 
 import java.io.ByteArrayInputStream;
@@ -23,7 +25,25 @@ public class Game implements Serializable {
         DRAGON, DARK, DREAM, CAT_BIRD, FLASH, SNOW, FIRE, BLOOD;
 
         public static Card indexOf(int index) {
-            return Card.class.getEnumConstants()[index];
+            switch (index){
+                case 0:
+                    return DRAGON;
+                case 1:
+                    return DARK;
+                case 2:
+                    return DREAM;
+                case 3:
+                    return CAT_BIRD;
+                case 4:
+                    return FLASH;
+                case 5:
+                    return SNOW;
+                case 6:
+                    return FIRE;
+                case 7:
+                    return BLOOD;
+            }
+            return null;
         }
 
         public int getIndex() {
@@ -33,7 +53,7 @@ public class Game implements Serializable {
 
     //游戏的状态
     public enum STATUS {
-        ROUND_STARTED, ROUND_CONTINUE, WAIT_FOR_DICE, ROUND_ENDED, TURN_ENDED, GAME_ENDED
+        GAME_INITED, ROUND_STARTED, ROUND_CONTINUE, WAIT_FOR_DICE, ROUND_ENDED, TURN_ENDED, GAME_ENDED
     }
 
     public class Player implements Serializable {
@@ -97,9 +117,9 @@ public class Game implements Serializable {
     private int dice;
 
     /**
-     * 开始游戏
+     * 初始化游戏
      */
-    public void start(String[] userIdList) {
+    public void init(String[] userIdList) {
         playerList = new ArrayList<>();
         for (String userId : userIdList) {
             Player player = new Player();
@@ -108,79 +128,25 @@ public class Game implements Serializable {
             playerList.add(player);
         }
         gameWinner = null;
+        status = STATUS.GAME_INITED;
+    }
 
+    /**
+     * 新一轮游戏
+     */
+    public void newTurn() {
         for (Player player : playerList) {
             player.blood = 6;
         }
         turnWinner = null;
         loser = new ArrayList<>();
         postCard();
-
         currentPlayer = playerList.get(0);
 
         whichMagic = null;
         doMagicSuccess = false;
         dice = 0;
-
         status = STATUS.ROUND_STARTED;
-    }
-
-    private boolean isTurnEndThenEndTurn() {
-        for (Player player : playerList) {
-            if (player.cardList.isEmpty()) {
-                status = STATUS.TURN_ENDED;
-                //玩家将手上的牌全部用完
-                turnWinner = player;
-                turnWinner.point += 3 + turnWinner.secretCardList.size();
-                return true;
-            }
-        }
-
-        loser = new ArrayList<>();
-        for (Player player : playerList) {
-            if (player.blood == 0) {
-                loser.add(player);
-            }
-        }
-        if (!loser.isEmpty()) {
-            status = STATUS.TURN_ENDED;
-            turnWinner = currentPlayer;
-            for (Player player : playerList) {
-                if (player.equals(turnWinner)) {
-                    //赢家加三分
-                    player.point += 3 + player.secretCardList.size();
-                } else if (loser.indexOf(player) == -1) {
-                    //其他存活的玩家加一分
-                    player.point += 1 + player.secretCardList.size();
-                }
-            }
-            return true;
-        }
-
-        for (Player player : playerList) {
-            if (player.blood == 0) {
-                status = STATUS.TURN_ENDED;
-                for (Player player1 : playerList) {
-                    if (!player.equals(player1)) {
-                        //除了输家，其他人都加一分
-                        player1.point += 1 + player1.secretCardList.size();
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isGameEndThenEndGame() {
-        for (Player player : playerList) {
-            if (player.point >= 8) {
-                status = STATUS.GAME_ENDED;
-                gameWinner = currentPlayer;
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -195,7 +161,6 @@ public class Game implements Serializable {
         } else {
             nextPlayer();
         }
-
     }
 
     private void nextPlayer() {
@@ -210,24 +175,6 @@ public class Game implements Serializable {
         currentPlayerIndex++;
         currentPlayerIndex %= playerList.size();
         currentPlayer = playerList.get(currentPlayerIndex);
-        status = STATUS.ROUND_STARTED;
-    }
-
-    /**
-     * 下一轮游戏
-     */
-    public void nextTurn() {
-        for (Player player : playerList) {
-            player.blood = 6;
-        }
-        turnWinner = null;
-        loser = new ArrayList<>();
-        postCard();
-
-        currentPlayer = playerList.get(0);
-        whichMagic = null;
-        doMagicSuccess = false;
-        dice = 0;
         status = STATUS.ROUND_STARTED;
     }
 
@@ -278,12 +225,14 @@ public class Game implements Serializable {
                             player.changeBlood(-1);
                     }
                     currentPlayer.changeBlood(1);
+                    status = STATUS.ROUND_ENDED;
                     break;
                 case CAT_BIRD:
                     //猫头鹰
                     if (secretCardList.size() > 0) {
                         currentPlayer.secretCardList.add(secretCardList.remove(secretCardList.size() - 1));
                     }
+                    status = STATUS.ROUND_ENDED;
                     break;
                 case FLASH:
                     //闪电暴风雨
@@ -295,20 +244,24 @@ public class Game implements Serializable {
                         //左边的玩家扣血
                         playerList.get((playerList.indexOf(currentPlayer) - 1 + playerList.size()) % playerList.size()).changeBlood(-1);
                     }
+                    status = STATUS.ROUND_ENDED;
                     break;
                 case SNOW:
                     //暴风雪
                     //左边的玩家扣血
                     playerList.get((playerList.indexOf(currentPlayer) - 1 + playerList.size()) % playerList.size()).changeBlood(-1);
+                    status = STATUS.ROUND_ENDED;
                     break;
                 case FIRE:
                     //火球术
                     //右边的玩家扣血
                     playerList.get((playerList.indexOf(currentPlayer) + 1) % playerList.size()).changeBlood(-1);
+                    status = STATUS.ROUND_ENDED;
                     break;
                 case BLOOD:
                     //魔法药水，自己加血
                     currentPlayer.changeBlood(1);
+                    status = STATUS.ROUND_ENDED;
                     break;
             }
             if(isTurnEndThenEndTurn()){
@@ -414,6 +367,7 @@ public class Game implements Serializable {
         int totalCount = 36;
         for (int i = 0; i < 36; i++) {
             Card card = randomCard(count, totalCount);
+            totalCount--;
             cardList.add(card);
         }
 
@@ -464,12 +418,69 @@ public class Game implements Serializable {
         for (int i = 0; i < count.length; i++) {
             if ((random -= count[i]) <= 0) {
                 count[i]--;
-                totalCount--;
                 return Card.indexOf(i);
             }
         }
         //理论上永远不会执行到这一步
         return null;
+    }
+
+    private boolean isTurnEndThenEndTurn() {
+        for (Player player : playerList) {
+            if (player.cardList.isEmpty()) {
+                status = STATUS.TURN_ENDED;
+                //玩家将手上的牌全部用完
+                turnWinner = player;
+                turnWinner.point += 3 + turnWinner.secretCardList.size();
+                return true;
+            }
+        }
+
+        loser = new ArrayList<>();
+        for (Player player : playerList) {
+            if (player.blood == 0) {
+                loser.add(player);
+            }
+        }
+        if (!loser.isEmpty()) {
+            status = STATUS.TURN_ENDED;
+            turnWinner = currentPlayer;
+            for (Player player : playerList) {
+                if (player.equals(turnWinner)) {
+                    //赢家加三分
+                    player.point += 3 + player.secretCardList.size();
+                } else if (loser.indexOf(player) == -1) {
+                    //其他存活的玩家加一分
+                    player.point += 1 + player.secretCardList.size();
+                }
+            }
+            return true;
+        }
+
+        for (Player player : playerList) {
+            if (player.blood == 0) {
+                status = STATUS.TURN_ENDED;
+                for (Player player1 : playerList) {
+                    if (!player.equals(player1)) {
+                        //除了输家，其他人都加一分
+                        player1.point += 1 + player1.secretCardList.size();
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isGameEndThenEndGame() {
+        for (Player player : playerList) {
+            if (player.point >= 8) {
+                status = STATUS.GAME_ENDED;
+                gameWinner = currentPlayer;
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -478,14 +489,14 @@ public class Game implements Serializable {
         ObjectOutputStream objectOutputStream;
         objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(this);
-        String string = byteArrayOutputStream.toString("utf-8");
+        String string = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
         objectOutputStream.close();
         byteArrayOutputStream.close();
         return string;
     }
 
     public static Game toGame(String str) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(Base64.decode(str, Base64.DEFAULT));
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         Game game = (Game) objectInputStream.readObject();
         objectInputStream.close();

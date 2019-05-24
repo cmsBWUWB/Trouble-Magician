@@ -1,7 +1,10 @@
 package com.hfut.trouble.game;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -35,6 +38,8 @@ public class GameRoomActivity extends BaseActivity {
     TextView tvGroupId;
     @BindView(R.id.lv_room_members)
     ListView lvRoomMember;
+    @BindView(R.id.bt_start_game)
+    Button btStartGame;
 
     private Group mGroup;
     private List<User> users = new ArrayList<>();
@@ -115,6 +120,20 @@ public class GameRoomActivity extends BaseActivity {
             }
         };
         IMManager.getInstance().addGroupChangeListener(mGroupChangeListener);
+        btStartGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GameRoomActivity.this, GameActivity.class);
+                String[] userIds = new String[users.size() + 1];
+                for (int i = 0; i < userIds.length - 1; i++) {
+                    userIds[i] = users.get(i).getUserId();
+                }
+                userIds[users.size()] = mGroup.getOwnerUserId();
+                intent.putExtra(GameActivity.KEY_USER_LIST, userIds);
+                intent.putExtra(GameActivity.KEY_GROUP, mGroup);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

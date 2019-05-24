@@ -8,6 +8,12 @@
         android:id="@+id/tv_group_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    <Button
+        android:layout_centerInParent="true"
+        android:id="@+id/bt_start_game"
+        android:text="@string/start_game"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <ListView
         android:id="@+id/lv_room_members"
