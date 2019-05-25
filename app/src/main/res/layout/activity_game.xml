@@ -1,45 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/lv_game_player"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <TextView
-        android:id="@+id/tv_game_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@null" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center">
+        android:layout_height="150dp"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_card_list_choose"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_my_card_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"/>
+
         <Spinner
-            android:id="@+id/sp_magic_list"
+            android:id="@+id/sp_card_list"
+            android:layout_width="match_parent"
             android:entries="@array/array_magic_list"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <Button
-            android:text="@string/do_magic"
             android:id="@+id/bt_do_magic"
-            android:layout_width="wrap_content"
+            android:text="@string/do_magic"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <Button
-            android:text="@string/throw_dice"
             android:id="@+id/bt_throw_dice"
-            android:layout_width="wrap_content"
+            android:text="@string/throw_dice"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <Button
             android:id="@+id/bt_pass"
             android:text="@string/pass"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </LinearLayout>

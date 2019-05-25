@@ -56,7 +56,7 @@ public class Game implements Serializable {
         GAME_INITED, ROUND_STARTED, ROUND_CONTINUE, WAIT_FOR_DICE, ROUND_ENDED, TURN_ENDED, GAME_ENDED
     }
 
-    public class Player implements Serializable {
+    public static class Player implements Serializable {
         private String userId;
         private int point;//分数
         private int blood;//血量
@@ -69,24 +69,44 @@ public class Game implements Serializable {
             blood = Math.max(0, blood);
         }
 
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
         public int getPoint() {
             return point;
+        }
+
+        public void setPoint(int point) {
+            this.point = point;
         }
 
         public int getBlood() {
             return blood;
         }
 
+        public void setBlood(int blood) {
+            this.blood = blood;
+        }
+
         public ArrayList<Card> getCardList() {
             return cardList;
+        }
+
+        public void setCardList(ArrayList<Card> cardList) {
+            this.cardList = cardList;
         }
 
         public ArrayList<Card> getSecretCardList() {
             return secretCardList;
         }
 
-        public String getUserId() {
-            return userId;
+        public void setSecretCardList(ArrayList<Card> secretCardList) {
+            this.secretCardList = secretCardList;
         }
 
         @Override
@@ -206,11 +226,6 @@ public class Game implements Serializable {
             doMagicSuccess = true;
             Card useCard = currentPlayer.cardList.remove(index);
             this.useCount[useCard.getIndex()]++;
-
-            if(isTurnEndThenEndTurn()){
-                isGameEndThenEndGame();
-                return;
-            }
 
             switch (magic) {
                 case DRAGON://古代巨龙
@@ -426,16 +441,28 @@ public class Game implements Serializable {
     }
 
     private boolean isTurnEndThenEndTurn() {
-        for (Player player : playerList) {
-            if (player.cardList.isEmpty()) {
-                status = STATUS.TURN_ENDED;
-                //玩家将手上的牌全部用完
-                turnWinner = player;
-                turnWinner.point += 3 + turnWinner.secretCardList.size();
-                return true;
-            }
+        //有赢家，其他所有人都是输家
+        if(currentPlayer.cardList.isEmpty()){
+            status = STATUS.TURN_ENDED;
+            //玩家将手上的牌全部用完
+            turnWinner = currentPlayer;
+            turnWinner.point += 3 + turnWinner.secretCardList.size();
+            return true;
         }
 
+        //只有输家，没有赢家
+        if(currentPlayer.blood == 0){
+            status = STATUS.TURN_ENDED;
+            for (Player player : playerList) {
+                if (!player.equals(currentPlayer)) {
+                    //除了输家，其他人都加一分
+                    player.point += 1 + player.secretCardList.size();
+                }
+            }
+            return true;
+        }
+
+        //某人把另外一个人打死了
         loser = new ArrayList<>();
         for (Player player : playerList) {
             if (player.blood == 0) {
@@ -456,19 +483,6 @@ public class Game implements Serializable {
             }
             return true;
         }
-
-        for (Player player : playerList) {
-            if (player.blood == 0) {
-                status = STATUS.TURN_ENDED;
-                for (Player player1 : playerList) {
-                    if (!player.equals(player1)) {
-                        //除了输家，其他人都加一分
-                        player1.point += 1 + player1.secretCardList.size();
-                    }
-                }
-                return true;
-            }
-        }
         return false;
     }
 
@@ -476,7 +490,7 @@ public class Game implements Serializable {
         for (Player player : playerList) {
             if (player.point >= 8) {
                 status = STATUS.GAME_ENDED;
-                gameWinner = currentPlayer;
+                gameWinner = player;
                 return true;
             }
         }

@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.gamelibrary.Game;
@@ -18,32 +17,29 @@ import com.hfut.trouble.R;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 
 public class GameActivity extends BaseActivity implements GameManager.ShowMe {
-
+    @BindView(R.id.lv_game_player)
+    ListView lvPlayerList;
+    @BindView(R.id.sp_card_list)
+    Spinner spCard;
     @BindView(R.id.bt_do_magic)
     Button btDoMagic;
     @BindView(R.id.bt_throw_dice)
     Button btThrowDice;
     @BindView(R.id.bt_pass)
     Button btPass;
-    @BindView(R.id.lv_game_player)
-    ListView lvPlayerList;
-    PlayerAdapter playerAdapter;
-    @BindView(R.id.sp_magic_list)
-    Spinner spCard;
-    @BindView(R.id.tv_game_info)
-    TextView tvGameInfo;
 
-    private Group group;
-    private String[] userIdList;
-    private boolean isOwner;
-    private String currentUserId;
+    PlayerAdapter playerAdapter;
+
 
     public static final String KEY_GROUP = "group";
     public static final String KEY_USER_LIST = "userList";
+
+    private String currentUserId;
 
     @Override
     public int getLayout() {
@@ -56,16 +52,36 @@ public class GameActivity extends BaseActivity implements GameManager.ShowMe {
         playerAdapter = new PlayerAdapter(getLayoutInflater(), new ArrayList<>());
         lvPlayerList.setAdapter(playerAdapter);
 
-        Intent intent = getIntent();
-        group = (Group) intent.getSerializableExtra(KEY_GROUP);
-        userIdList = intent.getStringArrayExtra(KEY_USER_LIST);
-
         currentUserId = IMManager.getInstance().getCurrentLoginUser().getUserId();
-        isOwner = group.getOwnerUserId().equals(currentUserId);
 
+        Intent intent = getIntent();
+        Group group = (Group) intent.getSerializableExtra(KEY_GROUP);
+        String[] userIdList = intent.getStringArrayExtra(KEY_USER_LIST);
         GameManager.getInstance().init(group, userIdList, this);
 
         setListener();
+    }
+
+    /**
+     * 测试
+     */
+    private void test(){
+        Game.Player player = new Game.Player();
+        player.setUserId("test");
+        player.setBlood(3);
+        player.setPoint(4);
+        ArrayList<Game.Card> cardList = new ArrayList<>();
+        cardList.add(Game.Card.FIRE);
+        cardList.add(Game.Card.DRAGON);
+        cardList.add(Game.Card.FIRE);
+        cardList.add(Game.Card.SNOW);
+        player.setCardList(cardList);
+
+        List<Game.Player> playerList = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            playerList.add(player);
+        }
+        playerAdapter.setData(playerList);
     }
 
     @Override
@@ -87,6 +103,7 @@ public class GameActivity extends BaseActivity implements GameManager.ShowMe {
             public void onClick(View v) {
                 int dice = GameManager.getInstance().getDice();
                 GameManager.getInstance().doThrowDice(dice);
+
             }
         });
         btPass.setOnClickListener(new View.OnClickListener() {
@@ -105,29 +122,7 @@ public class GameActivity extends BaseActivity implements GameManager.ShowMe {
         if(game.getStatus() == Game.STATUS.GAME_INITED){
             return;
         }
-
         playerAdapter.setData(game.getPlayerList());
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("status: ");
-        stringBuilder.append(game.getStatus().toString());
-        stringBuilder.append("\n");
-
-        stringBuilder.append("gameWinner: ");
-        stringBuilder.append(game.getGameWinner());
-        stringBuilder.append("\n");
-
-        stringBuilder.append("turnWinner: ");
-        stringBuilder.append(game.getTurnWinner());
-        stringBuilder.append("\n");
-
-        stringBuilder.append("useCount: ");
-        for(int i:game.getUseCount()){
-            stringBuilder.append(i);
-            stringBuilder.append(" ");
-        }
-        stringBuilder.append("\n");
-
-        tvGameInfo.setText(stringBuilder.toString());
 
         switch (game.getStatus()) {
             case ROUND_ENDED:
@@ -144,7 +139,7 @@ public class GameActivity extends BaseActivity implements GameManager.ShowMe {
     /**
      * 确定需要启用哪些按钮
      */
-    private void buttonEnableOrNot(Game game){
+    private void buttonEnableOrNot(Game game) {
         switch (game.getStatus()) {
             case ROUND_STARTED:
                 btDoMagic.setEnabled(true);

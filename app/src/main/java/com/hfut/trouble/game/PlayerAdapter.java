@@ -4,7 +4,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.hfut.gamelibrary.Game;
 import com.hfut.trouble.R;
@@ -12,7 +17,6 @@ import com.hfut.trouble.R;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.BindViews;
 import butterknife.ButterKnife;
 
 public class PlayerAdapter extends BaseAdapter {
@@ -39,7 +43,7 @@ public class PlayerAdapter extends BaseAdapter {
         return position;
     }
 
-    public void setData(List<Game.Player> playerList){
+    public void setData(List<Game.Player> playerList) {
         this.playerList = playerList;
         this.notifyDataSetChanged();
     }
@@ -47,38 +51,38 @@ public class PlayerAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if(convertView == null) {
+        if (convertView == null) {
             convertView = inflater.inflate(R.layout.item_lv_player, parent, false);
             viewHolder = new ViewHolder(convertView);
+            LinearLayoutManager llm = new LinearLayoutManager(parent.getContext());
+            llm.setOrientation(LinearLayoutManager.HORIZONTAL);
+            viewHolder.rvCardList.setLayoutManager(llm);
+            viewHolder.rvCardList.setAdapter(new CardListAdapter(inflater));
+
             convertView.setTag(viewHolder);
-        }else {
+        } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.tvId.setText(playerList.get(position).getUserId());
-        viewHolder.tvPoint.setText("" + playerList.get(position).getPoint());
-        viewHolder.tvBlood.setText("" + playerList.get(position).getBlood());
-        StringBuilder cardList = new StringBuilder();
-        for(Game.Card card:playerList.get(position).getCardList()){
-            if(card == null){
-                continue;
-            }
-            cardList.append(card.toString());
-            cardList.append(" ");
-        }
-        viewHolder.tvCardList.setText(cardList.toString());
+        Game.Player player = playerList.get(position);
+        viewHolder.tvPlayerName.setText(player.getUserId());
+        viewHolder.tvPlayerPoint.setText(parent.getContext().getString(R.string.player_point, Integer.toString(player.getPoint())));
+        viewHolder.bvBlood.setBlood(player.getBlood());
+        ((CardListAdapter) viewHolder.rvCardList.getAdapter()).setData(player.getCardList());
 
         return convertView;
     }
-    class ViewHolder{
-        @BindView(R.id.tv_player_id)
-        TextView tvId;
+
+    class ViewHolder {
+        @BindView(R.id.tv_player_name)
+        TextView tvPlayerName;
         @BindView(R.id.tv_player_point)
-        TextView tvPoint;
-        @BindView(R.id.tv_player_blood)
-        TextView tvBlood;
-        @BindView(R.id.tv_card)
-        TextView tvCardList;
-        ViewHolder(View v){
+        TextView tvPlayerPoint;
+        @BindView(R.id.bv_blood)
+        BloodView bvBlood;
+        @BindView(R.id.rv_card_list_player)
+        RecyclerView rvCardList;
+
+        ViewHolder(View v) {
             ButterKnife.bind(this, v);
         }
     }

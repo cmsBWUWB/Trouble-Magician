@@ -37,11 +37,9 @@ public class GameManager {
     private ShowMe showMe;
     private Game game;
     private Group group;
-    private String[] userIdList;
 
     public void init(Group group, String[] userIdList, ShowMe showMe) {
         this.group = group;
-        this.userIdList = userIdList;
         this.showMe = showMe;
         game = new Game();
         game.init(userIdList);
@@ -109,7 +107,7 @@ public class GameManager {
         game.doThrowDice(dice);
         showMe.showGame(game);
 
-        //告诉所有人我的选择
+        //告诉所有人我投的骰子
         ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
             @Override
             public void doWorkInRun() {
@@ -162,7 +160,7 @@ public class GameManager {
         for (Message message : messageList) {
             if (message.getChatId().equals(group.getGroupId())) {
                 //该群来消息了，做些什么？
-                //如果是第一次房主的游戏初始化，更新界面
+                //如果是房主的游戏发牌，更新界面
                 if ((game.getStatus() == Game.STATUS.GAME_INITED || game.getStatus() == Game.STATUS.TURN_ENDED) && message.getAuthorId().equals(group.getOwnerUserId())) {
                     try {
                         game = Game.toGame(message.getContent());
