@@ -26,7 +26,6 @@ import com.hyphenate.chat.EMGroupOptions;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.exceptions.HyphenateException;
-import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
@@ -182,7 +181,7 @@ public class IMManager {
     /**
      * 获取好友列表
      */
-    public List<User> getFriendList() {
+    public List<User> getFriendListFromServer() {
         try {
             return IMUtils.userIdList2UserList(emContactManager.getAllContactsFromServer());
         } catch (HyphenateException e) {
@@ -236,7 +235,7 @@ public class IMManager {
     /**
      * 从本地获取聊天会话列表
      */
-    public List<Chat> getConversationList() {
+    public List<Chat> getConversationListFromLocal() {
         emChatManager.loadAllConversations();
         Map<String, EMConversation> allConversations = emChatManager.getAllConversations();
 
@@ -252,7 +251,7 @@ public class IMManager {
      *
      * @param targetId 群id或者好友id
      */
-    public List<Message> getMessageList(String targetId, String msgId, int count) {
+    public List<Message> getMessageListFromLocal(String targetId, String msgId, int count) {
         emChatManager.loadAllConversations();
         List<Message> result = new ArrayList<>();
         EMConversation emConversation = emChatManager.getConversation(targetId);
@@ -371,7 +370,7 @@ public class IMManager {
     /**
      * 获取当前用户所有的群
      */
-    public void getGroupList(final DefaultCallback<List<Group>> callback) {
+    public void getGroupListFromServer(final DefaultCallback<List<Group>> callback) {
         emGroupManager.asyncGetJoinedGroupsFromServer(new EMValueCallBack<List<EMGroup>>() {
             @Override
             public void onSuccess(List<EMGroup> value) {
@@ -389,7 +388,7 @@ public class IMManager {
      * 获取群组的所有成员
      * 目前最多只拿100个成员，因为我们不会达到这个上限
      */
-    public void getGroupMemberList(final String groupId, final DefaultCallback<List<User>> callback) {
+    public void getGroupMemberListFromServer(final String groupId, final DefaultCallback<List<User>> callback) {
         final int pageSize = 100;
         emGroupManager.asyncFetchGroupMembers(groupId, "", pageSize, new EMValueCallBack<EMCursorResult<String>>() {
             @Override

@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -15,10 +14,6 @@ import com.hfut.trouble.R;
 
 /**
  * 最大血量决定画几个圆
- * 高度决定半径
- * 宽度决定空隙
- * <p>
- * 宽度和高度取最小的那个
  */
 public class BloodView extends View {
     private static final String TAG = BloodView.class.getSimpleName();

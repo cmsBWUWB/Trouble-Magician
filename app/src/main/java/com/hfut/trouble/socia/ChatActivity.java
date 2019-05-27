@@ -58,7 +58,7 @@ public class ChatActivity extends BaseActivity {
         //初始化消息列表
         messageAdapter = new MessageAdapter(getLayoutInflater(), currentUserId);
         lvChatMessage.setAdapter(messageAdapter);
-        messageAdapter.setData(IMManager.getInstance().getMessageList(targetId, null, 40));
+        messageAdapter.setData(IMManager.getInstance().getMessageListFromLocal(targetId, null, 40));
         lvChatMessage.setSelection(messageAdapter.getCount() - 1);
 
         etMessage.addTextChangedListener(new TextWatcher() {
@@ -92,7 +92,7 @@ public class ChatActivity extends BaseActivity {
                             @Override
                             public void run() {
                                 etMessage.setText("");
-                                messageAdapter.setData(IMManager.getInstance().getMessageList(targetId, null, 40));
+                                messageAdapter.setData(IMManager.getInstance().getMessageListFromLocal(targetId, null, 40));
                                 lvChatMessage.setSelection(messageAdapter.getCount() - 1);
                             }
                         });
@@ -116,7 +116,7 @@ public class ChatActivity extends BaseActivity {
     }
     @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onMessageReceivedEvent(MessageReceivedEvent event){
-        messageAdapter.setData(IMManager.getInstance().getMessageList(targetId, null, 40));
+        messageAdapter.setData(IMManager.getInstance().getMessageListFromLocal(targetId, null, 40));
         lvChatMessage.setSelection(messageAdapter.getCount() - 1);
     }
 }

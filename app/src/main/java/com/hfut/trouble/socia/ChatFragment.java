@@ -52,7 +52,7 @@ public class ChatFragment extends BaseFragment {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         chatListAdapter = new ChatListAdapter(inflater);
         lvChatList.setAdapter(chatListAdapter);
-        chatListAdapter.setData(IMManager.getInstance().getConversationList());
+        chatListAdapter.setData(IMManager.getInstance().getConversationListFromLocal());
         lvChatList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -76,6 +76,6 @@ public class ChatFragment extends BaseFragment {
     @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onMessageReceivedEvent(MessageReceivedEvent event){
         Log.e("ssss", "onMessageReceivedEvent: ");
-        chatListAdapter.setData(IMManager.getInstance().getConversationList());
+        chatListAdapter.setData(IMManager.getInstance().getConversationListFromLocal());
     }
 }

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.hfut.base.activity.BaseActivity;
+import com.hfut.gamelibrary.GameManager;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.imlibrary.listener.BaseGroupChangeListener;
@@ -41,7 +42,6 @@ public class GameRoomActivity extends BaseActivity {
     @BindView(R.id.bt_start_game)
     Button btStartGame;
 
-    private Group mGroup;
     private List<User> users = new ArrayList<>();
     private BaseGroupChangeListener mGroupChangeListener;
     private GameRoomMemberAdatper gameRoomMemberAdatper;
@@ -54,21 +54,17 @@ public class GameRoomActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mGroup = (Group) getIntent().getSerializableExtra(TAG_GROUP);
-        if (mGroup == null) {
-            showToast(R.string.error_hint);
-        } else {
-            final String strGroupId = getString(R.string.id_group, mGroup.getGroupId());
-            tvGroupId.setText(strGroupId);
-            gameRoomMemberAdatper = new GameRoomMemberAdatper(this, users);
-            lvRoomMember.setAdapter(gameRoomMemberAdatper);
-            syncGroupMember();
-            initListener();
-        }
+
+        String strRoomId = getString(R.string.id_group, GameManager.getInstance().getRoomId());
+        tvGroupId.setText(strRoomId);
+        gameRoomMemberAdatper = new GameRoomMemberAdatper(this, users);
+        lvRoomMember.setAdapter(gameRoomMemberAdatper);
+        syncGroupMember();
+        initListener();
     }
 
     private void syncGroupMember() {
-        IMManager.getInstance().getGroupMemberList(mGroup.getGroupId(), new DefaultCallback<List<User>>() {
+        GameManager.getInstance().getMemberList(new DefaultCallback<List<User>>() {
             @Override
             public void onSuccess(List<User> value) {
                 users.clear();
@@ -90,7 +86,7 @@ public class GameRoomActivity extends BaseActivity {
     }
 
     private void initListener() {
-        mGroupChangeListener = new BaseGroupChangeListener(mGroup.getGroupId()) {
+        mGroupChangeListener = new BaseGroupChangeListener(GameManager.getInstance().getRoomId()) {
             @Override
             public void onRequestToJoinAccepted(String groupId, String groupName, String accepter) {
                 super.onRequestToJoinAccepted(groupId, groupName, accepter);
@@ -119,19 +115,11 @@ public class GameRoomActivity extends BaseActivity {
                 syncGroupMember();
             }
         };
-        IMManager.getInstance().addGroupChangeListener(mGroupChangeListener);
+        GameManager.getInstance().addGroupChangeListener(mGroupChangeListener);
         btStartGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(GameRoomActivity.this, GameActivity.class);
-                String[] userIds = new String[users.size() + 1];
-                for (int i = 0; i < userIds.length - 1; i++) {
-                    userIds[i] = users.get(i).getUserId();
-                }
-                userIds[users.size()] = mGroup.getOwnerUserId();
-                intent.putExtra(GameActivity.KEY_USER_LIST, userIds);
-                intent.putExtra(GameActivity.KEY_GROUP, mGroup);
-                startActivity(intent);
+                startActivity(new Intent(GameRoomActivity.this, GameActivity.class));
             }
         });
     }
@@ -139,39 +127,21 @@ public class GameRoomActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (TextUtils.equals(mGroup.getOwnerUserId(), IMManager.getInstance().getCurrentLoginUser().getUserId())) {
-            IMManager.getInstance().destroyGroup(mGroup.getGroupId(),new BaseEMCallBack(){
-                @Override
-                public void onSuccess() {
-                    super.onSuccess();
-                    showToast(R.string.destroy_group_success);
-                    KLog.i("destroy group success");
-                }
+        GameManager.getInstance().exitGameRoom(new BaseEMCallBack(){
+            @Override
+            public void onSuccess() {
+                super.onSuccess();
+                showToast(R.string.exit_group_success);
+                KLog.i("exit group success");
+            }
 
-                @Override
-                public void onError(int code, String error) {
-                    super.onError(code, error);
-                    showToast(R.string.destroy_group_fail);
-                    KLog.i("code = " + code + ";errorMessage = " + error);
-                }
-            });
-        }else {
-            IMManager.getInstance().exitGroup(mGroup.getGroupId(),new BaseEMCallBack(){
-                @Override
-                public void onSuccess() {
-                    super.onSuccess();
-                    showToast(R.string.exit_group_success);
-                    KLog.i("exit group success");
-                }
-
-                @Override
-                public void onError(int code, String error) {
-                    super.onError(code, error);
-                    showToast(R.string.exit_group_fail);
-                    KLog.i("code = " + code + ";errorMessage = " + error);
-                }
-            });
-        }
-        IMManager.getInstance().removeGroupChangeListener(mGroupChangeListener);
+            @Override
+            public void onError(int code, String error) {
+                super.onError(code, error);
+                showToast(R.string.exit_group_fail);
+                KLog.i("code = " + code + ";errorMessage = " + error);
+            }
+        });
+        GameManager.getInstance().removeGroupChangeListener(mGroupChangeListener);
     }
 }

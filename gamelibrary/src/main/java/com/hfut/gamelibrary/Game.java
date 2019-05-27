@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +52,7 @@ public class Game implements Serializable {
 
     //游戏的状态
     public enum STATUS {
-        GAME_INITED, ROUND_STARTED, ROUND_CONTINUE, WAIT_FOR_DICE, ROUND_ENDED, TURN_ENDED, GAME_ENDED
+        WAIT_FOR_POST_CARD, ROUND_STARTED, ROUND_CONTINUE, WAIT_FOR_DICE, ROUND_ENDED, TURN_ENDED, GAME_ENDED
     }
 
     public static class Player implements Serializable {
@@ -73,40 +72,20 @@ public class Game implements Serializable {
             return userId;
         }
 
-        public void setUserId(String userId) {
-            this.userId = userId;
-        }
-
         public int getPoint() {
             return point;
-        }
-
-        public void setPoint(int point) {
-            this.point = point;
         }
 
         public int getBlood() {
             return blood;
         }
 
-        public void setBlood(int blood) {
-            this.blood = blood;
-        }
-
         public ArrayList<Card> getCardList() {
             return cardList;
         }
 
-        public void setCardList(ArrayList<Card> cardList) {
-            this.cardList = cardList;
-        }
-
         public ArrayList<Card> getSecretCardList() {
             return secretCardList;
-        }
-
-        public void setSecretCardList(ArrayList<Card> secretCardList) {
-            this.secretCardList = secretCardList;
         }
 
         @Override
@@ -122,57 +101,141 @@ public class Game implements Serializable {
 
 
     //每轮游戏相关的信息
+    private Player turnWinner;//当前轮次的赢家是谁？
     private int[] useCount;//每种牌用了多少张，这里是指所有人都能看到的
     private ArrayList<Card> cardList;//剩余可抽取的牌
     private ArrayList<Card> secretCardList;//神秘牌组
-    private Player turnWinner;//当前轮次的赢家是谁？
     private ArrayList<Player> loser;//当前轮次哪些人死了？
 
     //每个回合相关的信息
     private Player currentPlayer;//现在游戏是谁的回合？？
 
-    //每个动作相关的信息
+    //每个回合的每个动作相关的信息
     private Card whichMagic;
     private boolean doMagicSuccess;
     private int dice;
 
-    /**
-     * 初始化游戏
-     */
-    public void init(String[] userIdList) {
+    void init(ArrayList<String> userIdList){
+        if(userIdList.size() < 2){
+            throw new IllegalArgumentException();
+        }
         playerList = new ArrayList<>();
         for (String userId : userIdList) {
             Player player = new Player();
-            player.point = 0;
             player.userId = userId;
+            player.point = 0;
+            player.blood = 6;
+            player.cardList = new ArrayList<>();
+            player.secretCardList = new ArrayList<>();
             playerList.add(player);
         }
         gameWinner = null;
-        status = STATUS.GAME_INITED;
-    }
 
-    /**
-     * 新一轮游戏
-     */
-    public void newTurn() {
-        for (Player player : playerList) {
-            player.blood = 6;
-        }
         turnWinner = null;
         loser = new ArrayList<>();
-        postCard();
+        cardList = new ArrayList<>();
+        secretCardList = new ArrayList<>();
+
         currentPlayer = playerList.get(0);
 
         whichMagic = null;
         doMagicSuccess = false;
         dice = 0;
+
+        status = STATUS.WAIT_FOR_POST_CARD;
+    }
+
+    ArrayList<Card> generateCard(){
+        int[] count = new int[]{1, 2, 3, 4, 5, 6, 7, 8};
+        ArrayList<Card> cardList = new ArrayList<>();
+        int totalCount = 36;
+        for (int i = 0; i < 36; i++) {
+            Card card = randomCard(count, totalCount);
+            totalCount--;
+            cardList.add(card);
+        }
+        return cardList;
+    }
+
+    /**
+     * 随机选一张牌
+     */
+    private Card randomCard(int[] count, int totalCount) {
+        int random = (int) (Math.random() * totalCount) + 1;
+        for (int i = 0; i < count.length; i++) {
+            if ((random -= count[i]) <= 0) {
+                count[i]--;
+                return Card.indexOf(i);
+            }
+        }
+        //理论上永远不会执行到这一步
+        return null;
+    }
+
+    void postCard(ArrayList<Card> cardList){
+
+        //洗牌
+        this.useCount = new int[8];
+        this.cardList.clear();
+        this.secretCardList.clear();
+
+        //发牌
+        this.cardList.addAll(cardList);
+
+        //选择4张牌到猫头鹰那里
+        secretCardList.add(getCard());
+        secretCardList.add(getCard());
+        secretCardList.add(getCard());
+        secretCardList.add(getCard());
+
+        //两个人就移除12张牌，三个人就移除6张牌
+        if (playerList.size() == 2) {
+            //移除12个
+            for (int i = 0; i < 12; i++) {
+                Card useCard = getCard();
+                this.useCount[useCard.getIndex()]++;
+            }
+        } else if (playerList.size() == 3) {
+            //移除6个
+            for (int i = 0; i < 6; i++) {
+                Card useCard = getCard();
+                this.useCount[useCard.getIndex()]++;
+            }
+        }
+
+        //每个人发5张牌
+        for (Player player : playerList) {
+            player.cardList.clear();
+            for (int i = 0; i < 5; i++) {
+                player.cardList.add(getCard());
+            }
+            player.secretCardList.clear();
+        }
         status = STATUS.ROUND_STARTED;
+    }
+
+    /**
+     * 下一轮游戏
+     */
+    void nextTurn() {
+        for (Player player : playerList) {
+            player.blood = 6;
+        }
+        turnWinner = null;
+        loser.clear();
+
+        currentPlayer = playerList.get(0);
+
+        whichMagic = null;
+        doMagicSuccess = false;
+        dice = 0;
+        status = STATUS.WAIT_FOR_POST_CARD;
     }
 
     /**
      * 下一回合
      */
-    public void nextRound() {
+    void nextRound() {
         if (doMagicSuccess) {
             whichMagic = null;
             doMagicSuccess = false;
@@ -201,7 +264,7 @@ public class Game implements Serializable {
     /**
      * 施放魔法
      */
-    public void doMagic(Card magic) {
+    void doMagic(Card magic) {
         whichMagic = magic;
         //判断当前玩家是否有该魔法
         int index = currentPlayer.cardList.indexOf(magic);
@@ -290,7 +353,7 @@ public class Game implements Serializable {
     /**
      * 掷骰子
      */
-    public void doThrowDice(int dice) {
+    void doThrowDice(int dice) {
         this.dice = dice;
 
         switch (whichMagic) {
@@ -321,14 +384,14 @@ public class Game implements Serializable {
         }
     }
 
-    public int getDice() {
+    int getDice() {
         return (int) (Math.random() * 3) + 1;
     }
 
     /**
      * 玩家主动结束自己的回合
      */
-    public void pass() {
+    void pass() {
         nextPlayer();
     }
 
@@ -370,74 +433,10 @@ public class Game implements Serializable {
     }
 
     /**
-     * 发牌
-     */
-    private void postCard() {
-        //洗牌
-        cardList = new ArrayList<>();
-        this.useCount = new int[8];
-        secretCardList = new ArrayList<>();
-
-        int[] count = new int[]{1, 2, 3, 4, 5, 6, 7, 8};
-        int totalCount = 36;
-        for (int i = 0; i < 36; i++) {
-            Card card = randomCard(count, totalCount);
-            totalCount--;
-            cardList.add(card);
-        }
-
-        //发牌
-        //选择4张牌到猫头鹰那里
-        secretCardList.add(cardList.remove(cardList.size() - 1));
-        secretCardList.add(cardList.remove(cardList.size() - 1));
-        secretCardList.add(cardList.remove(cardList.size() - 1));
-        secretCardList.add(cardList.remove(cardList.size() - 1));
-
-        //两个人就移除12张牌，三个人就移除6张牌
-        if (playerList.size() == 2) {
-            //移除12个
-            for (int i = 0; i < 12; i++) {
-                Card useCard = getCard();
-                this.useCount[useCard.getIndex()]++;
-            }
-        } else if (playerList.size() == 3) {
-            //移除6个
-            for (int i = 0; i < 6; i++) {
-                Card useCard = getCard();
-                this.useCount[useCard.getIndex()]++;
-            }
-        }
-
-        //每个人发5张牌
-        for (Player player : playerList) {
-            player.cardList = new ArrayList<>();
-            for (int i = 0; i < 5; i++) {
-                player.cardList.add(getCard());
-            }
-            player.secretCardList = new ArrayList<>();
-        }
-    }
-
-    /**
      * 摸一张牌
      */
     private Card getCard() {
-        return cardList.remove(cardList.size() - 1);
-    }
-
-    /**
-     * 随机选一张牌
-     */
-    private Card randomCard(int[] count, int totalCount) {
-        int random = (int) (Math.random() * totalCount) + 1;
-        for (int i = 0; i < count.length; i++) {
-            if ((random -= count[i]) <= 0) {
-                count[i]--;
-                return Card.indexOf(i);
-            }
-        }
-        //理论上永远不会执行到这一步
-        return null;
+        return this.cardList.remove(this.cardList.size() - 1);
     }
 
     private boolean isTurnEndThenEndTurn() {
@@ -498,7 +497,7 @@ public class Game implements Serializable {
     }
 
 
-    public String toText() throws IOException {
+    String toText() throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream;
         objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -509,12 +508,33 @@ public class Game implements Serializable {
         return string;
     }
 
-    public static Game toGame(String str) throws IOException, ClassNotFoundException {
+    static Game toGame(String str) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(Base64.decode(str, Base64.DEFAULT));
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         Game game = (Game) objectInputStream.readObject();
         objectInputStream.close();
         byteArrayInputStream.close();
         return game;
+    }
+
+
+    static String fromCardList(ArrayList<Card> cardList) throws IOException{
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream;
+        objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(cardList);
+        String string = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+        objectOutputStream.close();
+        byteArrayOutputStream.close();
+        return string;
+    }
+
+    static ArrayList<Card> toCardList(String str) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(Base64.decode(str, Base64.DEFAULT));
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        ArrayList<Card> cardArrayList = (ArrayList<Card>) objectInputStream.readObject();
+        objectInputStream.close();
+        byteArrayInputStream.close();
+        return cardArrayList;
     }
 }

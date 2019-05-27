@@ -95,7 +95,7 @@ public class FriendFragment extends BaseFragment {
         ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
             @Override
             public void doWorkInRun() {
-                List<User> friendList = IMManager.getInstance().getFriendList();
+                List<User> friendList = IMManager.getInstance().getFriendListFromServer();
                 ThreadDispatcher.getInstance().postToMainThread(new Runnable() {
                     @Override
                     public void run() {

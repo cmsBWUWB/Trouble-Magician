@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.hfut.base.fragment.BaseFragment;
+import com.hfut.gamelibrary.GameManager;
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.imlibrary.model.Group;
@@ -38,7 +39,7 @@ public class GameFragment extends BaseFragment {
 
     @OnClick(R.id.bt_create_room)
     void clickCreateRoom(View view) {
-        IMManager.getInstance().createGroup("测试房间", new DefaultCallback<Group>() {
+        GameManager.getInstance().createGameRoom("测试房间", new DefaultCallback<Group>() {
             @Override
             public void onSuccess(Group group) {
                 if (group != null) {
@@ -74,21 +75,13 @@ public class GameFragment extends BaseFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final String groupId = editText.getText().toString().trim();
-                        IMManager.getInstance().requestJoinGroup(groupId,new BaseEMCallBack(){
+                        GameManager.getInstance().joinGameRoom(groupId, new DefaultCallback<Group>(){
                             @Override
-                            public void onSuccess() {
-                                super.onSuccess();
+                            public void onSuccess(Group value) {
                                 goToGameRoomActivity(context, groupId);
                             }
-
                             @Override
-                            public void onError(int code, String error) {
-                                super.onError(code, error);
-                                if (code == 601) {
-                                    //用户已经加入过该房间，直接跳转到页面
-                                    goToGameRoomActivity(context, groupId);
-                                }
-                                KLog.e("code = " + code + ";error = " + error);
+                            public void onFail(int errorCode, @NotNull String errorMsg) {
                             }
                         });
                         dialog.dismiss();

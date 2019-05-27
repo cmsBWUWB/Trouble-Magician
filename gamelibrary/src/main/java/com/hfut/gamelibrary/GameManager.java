@@ -1,18 +1,28 @@
 package com.hfut.gamelibrary;
 
+import android.content.Intent;
+
 import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
 import com.hfut.imlibrary.event.MessageReceivedEvent;
+import com.hfut.imlibrary.listener.BaseEMCallBack;
+import com.hfut.imlibrary.listener.BaseGroupChangeListener;
 import com.hfut.imlibrary.model.Group;
 import com.hfut.imlibrary.model.Message;
+import com.hfut.imlibrary.model.User;
+import com.hfut.utils.callbacks.DefaultCallback;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
+import com.hyphenate.EMError;
+import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager {
@@ -25,41 +35,170 @@ public class GameManager {
         return instance;
     }
 
-    public interface ShowMe {
-        void showGame(Game game);
+    public interface EventListener {
+        void postCard();
+
+        void otherDoMagic(String userId, Game.Card magic);
+
+        void otherDoThrowDice(String userId, int dice);
+
+        void otherPass(String userId);
     }
+
 
     public static final String TYPE_DICE = "dice";
     public static final String TYPE_MAGIC = "magic";
     public static final String TYPE_PASS = "pass";
 
 
-    private ShowMe showMe;
-    private Game game;
     private Group group;
+    private boolean isOwner;
+    private ArrayList<String> userIdList;
+    private Game game;
 
-    public void init(Group group, String[] userIdList, ShowMe showMe) {
-        this.group = group;
-        this.showMe = showMe;
-        game = new Game();
-        game.init(userIdList);
+    private EventListener eventListener;
 
-        newTurn();
+    /**
+     * 加入游戏房间
+     */
+    public void joinGameRoom(final String groupId, final DefaultCallback<Group> defaultCallback) {
+        isOwner = false;
 
-        EventBus.getDefault().register(this);
+        IMManager.getInstance().requestJoinGroup(groupId, new BaseEMCallBack(){
+            @Override
+            public void onSuccess() {
+                super.onSuccess();
+                IMManager.getInstance().getGroupFromServer(groupId, new DefaultCallback<Group>() {
+                    @Override
+                    public void onSuccess(Group value) {
+                        GameManager.this.group = value;
+                        defaultCallback.onSuccess(group);
+                    }
+
+                    @Override
+                    public void onFail(int errorCode, @NotNull String errorMsg) {
+                        defaultCallback.onFail(errorCode, errorMsg);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(int code, String error) {
+                super.onError(code, error);
+                if(code == EMError.GROUP_ALREADY_JOINED){
+                    //已经加入群组
+                    IMManager.getInstance().getGroupFromServer(groupId, new DefaultCallback<Group>() {
+                        @Override
+                        public void onSuccess(Group value) {
+                            GameManager.this.group = value;
+                            defaultCallback.onSuccess(group);
+                        }
+
+                        @Override
+                        public void onFail(int errorCode, @NotNull String errorMsg) {
+                            defaultCallback.onFail(errorCode, errorMsg);
+                        }
+                    });
+                }else {
+                    defaultCallback.onFail(code, error);
+                }
+            }
+        });
     }
 
-    public void newTurn() {
-        String currentUserId = IMManager.getInstance().getCurrentLoginUser().getUserId();
-        if (currentUserId.equals(group.getOwnerUserId())) {
-            //如果自己是房主，则要发牌，并发送给所有人
-            game.newTurn();
-            showMe.showGame(game);
+    /**
+     * 创建游戏房间
+     */
+    public void createGameRoom(String gameRoomName, final DefaultCallback<Group> defaultCallback) {
+        isOwner = true;
+
+        IMManager.getInstance().createGroup(gameRoomName, new DefaultCallback<Group>() {
+            @Override
+            public void onSuccess(Group value) {
+                GameManager.this.group = value;
+                defaultCallback.onSuccess(value);
+            }
+
+            @Override
+            public void onFail(int errorCode, @NotNull String errorMsg) {
+                defaultCallback.onFail(errorCode, errorMsg);
+            }
+        });
+    }
+
+    public void addGroupChangeListener(BaseGroupChangeListener mGroupChangeListener){
+        IMManager.getInstance().addGroupChangeListener(mGroupChangeListener);
+    }
+
+    public void removeGroupChangeListener(BaseGroupChangeListener mGroupChangeListener){
+        IMManager.getInstance().removeGroupChangeListener(mGroupChangeListener);
+    }
+
+    public void exitGameRoom(BaseEMCallBack baseEMCallBack) {
+        EventBus.getDefault().unregister(this);
+        this.eventListener = null;
+        game = null;
+
+        if (isOwner) {
+            IMManager.getInstance().destroyGroup(group.getGroupId(), baseEMCallBack);
+        } else {
+            IMManager.getInstance().exitGroup(group.getGroupId(), baseEMCallBack);
+        }
+    }
+
+    public String getRoomId() {
+        return group.getGroupId();
+    }
+    public String getRoomMaster(){
+        return group.getOwnerUserId();
+    }
+
+    public boolean isOwner(){
+        return isOwner;
+    }
+
+    public void getMemberList(final DefaultCallback<List<User>> defaultCallback) {
+        IMManager.getInstance().getGroupMemberListFromServer(GameManager.getInstance().getRoomId(), new DefaultCallback<List<User>>() {
+            @Override
+            public void onSuccess(List<User> value) {
+                GameManager.this.userIdList = new ArrayList<>();
+                for(User user:value) {
+                    GameManager.this.userIdList.add(user.getUserId());
+                }
+                defaultCallback.onSuccess(value);
+            }
+
+            @Override
+            public void onFail(int errorCode, @NotNull String errorMsg) {
+                defaultCallback.onFail(errorCode, errorMsg);
+            }
+        });
+    }
+
+    public Game getGame(){
+        return game;
+    }
+
+    /**
+     * 开始游戏
+     */
+    public void startGame(EventListener eventListener) {
+        if(!userIdList.contains(GameManager.getInstance().getRoomMaster())){
+            userIdList.add(GameManager.getInstance().getRoomMaster());
+        }
+        this.eventListener = eventListener;
+        EventBus.getDefault().register(this);
+
+        game = new Game();
+        game.init(userIdList);
+        if (isOwner) {
+            final ArrayList<Game.Card> cardArrayList = game.generateCard();
+            game.postCard(cardArrayList);
             ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
                 @Override
                 public void doWorkInRun() {
                     try {
-                        IMManager.getInstance().sendGroupMessage(game.toText(), GameManager.this.group.getGroupId(), new OperateCallBack() {
+                        IMManager.getInstance().sendGroupMessage(Game.fromCardList(cardArrayList), GameManager.this.group.getGroupId(), new OperateCallBack() {
                             @Override
                             public void onSuccess() {
                             }
@@ -76,16 +215,8 @@ public class GameManager {
         }
     }
 
-    public void exit() {
-        EventBus.getDefault().unregister(this);
-        this.showMe = null;
-        this.game = null;
-    }
-
     public void doMagic(final Game.Card card) {
         game.doMagic(card);
-        showMe.showGame(game);
-
         //告诉所有人我的选择
         ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
             @Override
@@ -105,8 +236,6 @@ public class GameManager {
 
     public void doThrowDice(final int dice) {
         game.doThrowDice(dice);
-        showMe.showGame(game);
-
         //告诉所有人我投的骰子
         ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
             @Override
@@ -128,15 +257,39 @@ public class GameManager {
         return game.getDice();
     }
 
+
     public void nextRound() {
         game.nextRound();
-        showMe.showGame(game);
+    }
+
+    public void nextTurn() {
+        game.nextTurn();
+        if(isOwner){
+            final ArrayList<Game.Card> cardArrayList = game.generateCard();
+            game.postCard(cardArrayList);
+            ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
+                @Override
+                public void doWorkInRun() {
+                    try {
+                        IMManager.getInstance().sendGroupMessage(Game.fromCardList(cardArrayList), GameManager.this.group.getGroupId(), new OperateCallBack() {
+                            @Override
+                            public void onSuccess() {
+                            }
+
+                            @Override
+                            public void onFailure() {
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     public void pass() {
         game.pass();
-        showMe.showGame(game);
-
         //告诉所有人我的选择
         ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
             @Override
@@ -161,10 +314,21 @@ public class GameManager {
             if (message.getChatId().equals(group.getGroupId())) {
                 //该群来消息了，做些什么？
                 //如果是房主的游戏发牌，更新界面
-                if ((game.getStatus() == Game.STATUS.GAME_INITED || game.getStatus() == Game.STATUS.TURN_ENDED) && message.getAuthorId().equals(group.getOwnerUserId())) {
+                if (game == null && message.getAuthorId().equals(group.getOwnerUserId())) {
                     try {
-                        game = Game.toGame(message.getContent());
-                        showMe.showGame(game);
+                        game.postCard(Game.toCardList(message.getContent()));
+                        eventListener.postCard();
+                        continue;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                } else if (game != null && game.getStatus() == Game.STATUS.WAIT_FOR_POST_CARD && message.getAuthorId().equals(group.getOwnerUserId())) {
+                    try {
+                        game.postCard(Game.toCardList(message.getContent()));
+                        eventListener.postCard();
+                        continue;
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ClassNotFoundException e) {
@@ -176,17 +340,19 @@ public class GameManager {
                 switch (keyValue[0]) {
                     case TYPE_MAGIC:
                         //如果是他人施放魔法，更新界面
-                        game.doMagic(Game.Card.valueOf(keyValue[1]));
-                        showMe.showGame(game);
+                        Game.Card card = Game.Card.valueOf(keyValue[1]);
+                        game.doMagic(card);
+                        eventListener.otherDoMagic(message.getAuthorId(), card);
                         break;
                     case TYPE_DICE:
                         //如果是他人掷骰子，更新界面
-                        game.doThrowDice(Integer.valueOf(keyValue[1]));
-                        showMe.showGame(game);
+                        int dice = Integer.valueOf(keyValue[1]);
+                        game.doThrowDice(dice);
+                        eventListener.otherDoThrowDice(message.getAuthorId(), dice);
                         break;
                     case TYPE_PASS:
                         game.pass();
-                        showMe.showGame(game);
+                        eventListener.otherPass(message.getAuthorId());
                         break;
                 }
             }
