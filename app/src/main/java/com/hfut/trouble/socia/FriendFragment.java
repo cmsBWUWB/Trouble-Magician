@@ -5,9 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +13,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.hfut.base.fragment.BaseFragment;
-import com.hfut.imlibrary.IMManager;
+import com.hfut.base.manager.IMManager;
 import com.hfut.imlibrary.event.FriendChangeEvent;
-import com.hfut.imlibrary.model.Chat;
 import com.hfut.imlibrary.model.Message;
 import com.hfut.imlibrary.model.User;
 import com.hfut.trouble.R;
@@ -31,7 +28,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static com.hfut.trouble.socia.ChatActivity.KEY_TARGET;
 import static com.hfut.trouble.socia.ChatActivity.KEY_TYPE;

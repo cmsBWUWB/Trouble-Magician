@@ -6,9 +6,8 @@ import android.os.Handler;
 import android.os.Message;
 import androidx.annotation.Nullable;
 
-import com.hfut.base.activity.BaseActivity;
 import com.hfut.base.activity.PermissionActivity;
-import com.hfut.imlibrary.IMManager;
+import com.hfut.base.manager.IMManager;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
 

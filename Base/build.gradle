@@ -27,6 +27,7 @@ android {
 dependencies {
     implementation project(':Utils')
     implementation project(':imlibrary')
+    implementation project(':Bmob')
     implementation "androidx.appcompat:appcompat:$ANDROID_X_VERSION"
     //    butterknife相关配置，为避免与appcompat-v7冲突，这里使用butterknife8.0。
     implementation 'com.jakewharton:butterknife:10.1.0'

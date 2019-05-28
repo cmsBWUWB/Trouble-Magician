@@ -1,4 +1,4 @@
-package com.hfut.imlibrary
+package com.hfut.base.manager
 
 import android.text.TextUtils
 import com.hfut.imlibrary.model.User

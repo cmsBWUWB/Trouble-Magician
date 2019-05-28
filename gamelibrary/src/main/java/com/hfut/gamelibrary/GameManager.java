@@ -1,8 +1,6 @@
 package com.hfut.gamelibrary;
 
-import android.content.Intent;
-
-import com.hfut.imlibrary.IMManager;
+import com.hfut.base.manager.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
 import com.hfut.imlibrary.event.MessageReceivedEvent;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
@@ -14,7 +12,6 @@ import com.hfut.utils.callbacks.DefaultCallback;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
 import com.hyphenate.EMError;
-import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

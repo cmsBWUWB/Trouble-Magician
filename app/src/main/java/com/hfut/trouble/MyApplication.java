@@ -3,7 +3,7 @@ package com.hfut.trouble;
 import android.app.Application;
 
 import com.hfut.base.application.CoreManager;
-import com.hfut.imlibrary.IMManager;
+import com.hfut.base.manager.IMManager;
 import com.hfut.utils.utils.Utils;
 import com.socks.library.KLog;
 

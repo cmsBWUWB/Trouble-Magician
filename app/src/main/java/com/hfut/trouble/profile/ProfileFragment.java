@@ -17,8 +17,8 @@ import com.hfut.base.dialog.CameraHandler;
 import com.hfut.base.fragment.BaseFragment;
 import com.hfut.base.model.CameraImageBean;
 import com.hfut.base.model.RequestCodes;
-import com.hfut.imlibrary.IMManager;
-import com.hfut.imlibrary.UserManager;
+import com.hfut.base.manager.IMManager;
+import com.hfut.base.manager.UserManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.trouble.LoginActivity;
 import com.hfut.trouble.R;
@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.net.URI;
 
 import butterknife.BindView;
 import butterknife.OnClick;

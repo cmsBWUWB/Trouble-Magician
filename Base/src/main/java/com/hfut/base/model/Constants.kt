@@ -13,3 +13,9 @@ class RequestCodes {
         const val SCAN = 7
     }
 }
+
+class SPKeys{
+    companion object{
+        const val KEY_USER = "key_user"
+    }
+}

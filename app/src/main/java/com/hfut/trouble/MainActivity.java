@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.hfut.base.activity.BaseActivity;
-import com.hfut.imlibrary.IMManager;
+import com.hfut.base.manager.IMManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.trouble.profile.ProfileFragment;
 import com.hfut.trouble.socia.SociaFragment;

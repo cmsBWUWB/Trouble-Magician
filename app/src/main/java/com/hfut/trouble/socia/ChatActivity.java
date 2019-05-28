@@ -14,7 +14,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.hfut.base.activity.BaseActivity;
-import com.hfut.imlibrary.IMManager;
+import com.hfut.base.manager.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
 import com.hfut.imlibrary.event.MessageReceivedEvent;
 import com.hfut.imlibrary.model.Message;

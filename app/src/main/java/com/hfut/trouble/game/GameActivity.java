@@ -9,7 +9,7 @@ import android.widget.Spinner;
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.gamelibrary.Game;
 import com.hfut.gamelibrary.GameManager;
-import com.hfut.imlibrary.IMManager;
+import com.hfut.base.manager.IMManager;
 import com.hfut.trouble.R;
 
 import org.jetbrains.annotations.Nullable;

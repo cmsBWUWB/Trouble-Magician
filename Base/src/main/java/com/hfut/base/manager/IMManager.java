@@ -1,9 +1,11 @@
-package com.hfut.imlibrary;
+package com.hfut.base.manager;
 
 import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.hfut.imlibrary.IMUtils;
+import com.hfut.imlibrary.OperateCallBack;
 import com.hfut.imlibrary.event.MessageReceivedEvent;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.imlibrary.listener.BaseGroupChangeListener;

@@ -8,18 +8,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.hfut.base.activity.BaseActivity;
-import com.hfut.imlibrary.IMManager;
+import com.hfut.base.manager.IMManager;
 import com.hfut.imlibrary.OperateCallBack;
-import com.hfut.imlibrary.model.User;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
 import com.hfut.utils.utils.ToastUtils;
-import com.socks.library.KLog;
 
 import butterknife.BindView;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.SaveListener;
-import xiaoma.com.bomb.BmobManager;
 
 public class LoginActivity extends BaseActivity {
 

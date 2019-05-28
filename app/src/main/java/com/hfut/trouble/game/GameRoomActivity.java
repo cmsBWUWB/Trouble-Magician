@@ -2,7 +2,6 @@ package com.hfut.trouble.game;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -12,10 +11,8 @@ import androidx.annotation.Nullable;
 
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.gamelibrary.GameManager;
-import com.hfut.imlibrary.IMManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.imlibrary.listener.BaseGroupChangeListener;
-import com.hfut.imlibrary.model.Group;
 import com.hfut.imlibrary.model.User;
 import com.hfut.trouble.R;
 import com.hfut.utils.callbacks.DefaultCallback;

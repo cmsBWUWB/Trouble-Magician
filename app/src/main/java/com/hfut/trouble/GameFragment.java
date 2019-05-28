@@ -3,20 +3,15 @@ package com.hfut.trouble;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
+
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.hfut.base.fragment.BaseFragment;
 import com.hfut.gamelibrary.GameManager;
-import com.hfut.imlibrary.IMManager;
-import com.hfut.imlibrary.listener.BaseEMCallBack;
+import com.hfut.base.manager.IMManager;
 import com.hfut.imlibrary.model.Group;
 import com.hfut.trouble.game.GameRoomActivity;
 import com.hfut.utils.callbacks.DefaultCallback;
