@@ -3,6 +3,8 @@ package com.hfut.imlibrary.model;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import cn.bmob.v3.BmobObject;
@@ -36,5 +38,11 @@ public class User extends BmobObject {
 
     public void setPicPath(String picPath) {
         this.picPath = picPath;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return String.format("userId = %s,userName = %s,picPath = %s", userId, username, picPath);
     }
 }

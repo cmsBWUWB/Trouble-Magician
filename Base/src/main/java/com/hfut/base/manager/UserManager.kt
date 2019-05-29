@@ -44,8 +44,8 @@ object UserManager{
         userId?.let { BmobManager.getInstance().queryData("User", Array(1) { "userId" }, Array(1) { userId as String }, object : DefaultCallback<String> {
             override fun onSuccess(value: String) {
                 val array = GsonUtils.fromJsonToList(value,Array<User>::class.java)
-                val user = array.get(0)
-                KLog.v(UserManager.javaClass.simpleName, "update user $user")
+                val user = array[0]
+                KLog.v(UserManager.javaClass.simpleName, "update {$user}")
                 updateUserToCache(user)
             }
 
