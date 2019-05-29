@@ -4,10 +4,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -66,7 +64,7 @@ public class PlayerAdapter extends BaseAdapter {
         Game.Player player = playerList.get(position);
         viewHolder.tvPlayerName.setText(player.getUserId());
         viewHolder.tvPlayerPoint.setText(parent.getContext().getString(R.string.player_point, Integer.toString(player.getPoint())));
-        viewHolder.bvBlood.setBlood(player.getBlood());
+        viewHolder.bvBlood.setCurrentBlood(player.getBlood());
         ((CardListAdapter) viewHolder.rvCardList.getAdapter()).setData(player.getCardList());
 
         return convertView;

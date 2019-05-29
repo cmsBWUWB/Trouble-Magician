@@ -61,7 +61,7 @@ public class GameRoomActivity extends BaseActivity {
     }
 
     private void syncGroupMember() {
-        GameManager.getInstance().getMemberList(new DefaultCallback<List<User>>() {
+        GameManager.getInstance().getRoomMemberList(new DefaultCallback<List<User>>() {
             @Override
             public void onSuccess(List<User> value) {
                 users.clear();

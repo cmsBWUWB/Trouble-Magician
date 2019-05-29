@@ -1,5 +1,8 @@
 package com.hfut.trouble.game;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -42,18 +45,14 @@ public class BloodView extends View {
         int count = ta.getIndexCount();
         for (int i = 0; i < count; i++) {
             int index = ta.getIndex(i);
-            switch (index) {
-                case R.styleable.BloodView_max_blood:
-                    maxBlood = ta.getInteger(R.styleable.BloodView_max_blood, 3);
-                    currentBlood = maxBlood;
-                    centerX = new int[maxBlood];
-                    break;
-                case R.styleable.BloodView_space:
-                    space = ta.getDimensionPixelSize(R.styleable.BloodView_space, 4);
-                    break;
-                case R.styleable.BloodView_radius:
-                    radius = ta.getDimensionPixelSize(R.styleable.BloodView_radius, 10);
-                    break;
+            if (index == R.styleable.BloodView_max_blood) {
+                maxBlood = ta.getInteger(R.styleable.BloodView_max_blood, 3);
+                currentBlood = maxBlood;
+                centerX = new int[maxBlood];
+            } else if (index == R.styleable.BloodView_space) {
+                space = ta.getDimensionPixelSize(R.styleable.BloodView_space, 4);
+            } else if (index == R.styleable.BloodView_radius) {
+                radius = ta.getDimensionPixelSize(R.styleable.BloodView_radius, 10);
             }
         }
         ta.recycle();
@@ -72,7 +71,7 @@ public class BloodView extends View {
         for (int i = 0; i < centerX.length; i++) {
             centerX[i] = radius + i * (radius * 2 + space);
         }
-        centerY = radius;
+        centerY = (int) (radius * 1.5);
     }
 
     private int measureWidth() {
@@ -80,7 +79,7 @@ public class BloodView extends View {
     }
 
     private int measureHeight() {
-        return radius * 2;
+        return radius * 3;
     }
 
     private void initPaint() {
@@ -90,18 +89,138 @@ public class BloodView extends View {
         mPaint.setAntiAlias(true);
     }
 
-    public void setBlood(int currentBlood) {
+    ObjectAnimator objectAnimator;
+
+    public int getCurrentBlood(){
+        return currentBlood;
+    }
+
+    public void setCurrentBlood(int currentBlood) {
+        if(objectAnimator != null){
+            objectAnimator.end();
+        }
+
         currentBlood = Math.max(currentBlood, 0);
         currentBlood = Math.min(currentBlood, maxBlood);
+
+        changeBlood = currentBlood - this.currentBlood;
         this.currentBlood = currentBlood;
+
+        if(changeBlood < 0) {
+            //如果是扣血
+            objectAnimator = ObjectAnimator.ofFloat(this, "shake", 0, 1, -1, 0);
+            objectAnimator.setRepeatMode(ValueAnimator.RESTART);
+            objectAnimator.setRepeatCount(6);
+            objectAnimator.setDuration(50);
+            objectAnimator.start();
+            objectAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    changeBlood = 0;
+                    invalidate();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    changeBlood = 0;
+                    invalidate();
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            });
+        }else if(changeBlood > 0){
+            //如果是加血
+            objectAnimator = ObjectAnimator.ofFloat(this, "bloodAlpha", 0, 1);
+            objectAnimator.setDuration(500);
+            objectAnimator.start();
+            objectAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    changeBlood = 0;
+                    invalidate();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    changeBlood = 0;
+                    invalidate();
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+        }
+    }
+
+    private int changeBlood;
+    private float shake;
+    private float bloodAlpha;
+
+    public void setShake(float shake){
+        this.shake = shake;
         invalidate();
+    }
+    public void setBloodAlpha(float bloodAlpha){
+        this.bloodAlpha = bloodAlpha;
+        invalidate();
+    }
+
+    /**
+     * 抖动绘制
+     */
+    private void drawShake(Canvas canvas, int startIndex, int endIndex){
+        for(int i = startIndex; i <= endIndex; i++){
+            canvas.drawCircle(centerX[i], centerY + (int)(shake * radius / 2), radius, mPaint);
+        }
+    }
+
+    /**
+     * 加血绘制
+     */
+    private void drawAddBlood(Canvas canvas, int startIndex, int endIndex){
+        mPaint.setAlpha((int) (255 * bloodAlpha));
+        for(int i = startIndex; i <= endIndex; i++){
+            canvas.drawCircle(centerX[i], centerY, radius, mPaint);
+        }
+        mPaint.setAlpha(255);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for (int i = centerX.length - 1; i >= maxBlood - currentBlood; i--) {
+        int startIndex = 0, endIndex = 0;
+        if(changeBlood < 0) {
+            startIndex = maxBlood - currentBlood;
+            endIndex = maxBlood - 1;
+        }else if(changeBlood > 0){
+            startIndex = maxBlood - currentBlood + changeBlood;
+            endIndex = maxBlood - 1;
+        }else{
+            startIndex = maxBlood - currentBlood;
+            endIndex = maxBlood - 1;
+        }
+
+        for (int i = startIndex; i <= endIndex; i++) {
             canvas.drawCircle(centerX[i], centerY, radius, mPaint);
+        }
+
+        if(changeBlood < 0){
+            drawShake(canvas, startIndex + changeBlood, startIndex - 1);
+        }else if(changeBlood > 0){
+            drawAddBlood(canvas, startIndex - changeBlood, startIndex - 1);
         }
     }
 }

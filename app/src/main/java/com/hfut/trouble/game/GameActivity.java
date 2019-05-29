@@ -58,6 +58,7 @@ public class GameActivity extends BaseActivity implements GameManager.EventListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        GameManager.getInstance().endGame();
     }
 
     private void setListener() {

@@ -47,6 +47,8 @@ public class GameManager {
     public static final String TYPE_MAGIC = "magic";
     public static final String TYPE_PASS = "pass";
 
+    private static final String GAME_GROUP_NAME = "game room";
+
 
     private Group group;
     private boolean isOwner;
@@ -54,6 +56,26 @@ public class GameManager {
     private Game game;
 
     private EventListener eventListener;
+
+    public void isAlreadyInRoom(final DefaultCallback<Boolean> defaultCallback){
+        IMManager.getInstance().getGroupListFromServer(new DefaultCallback<List<Group>>() {
+            @Override
+            public void onSuccess(List<Group> value) {
+                for(Group group:value){
+                    if(group.getGroupName().equals(GAME_GROUP_NAME)){
+                        GameManager.this.group = group;
+                        isOwner = group.getOwnerUserId().equals(IMManager.getInstance().getCurrentLoginUser().getUserId());
+                        defaultCallback.onSuccess(true);
+                    }
+                }
+            }
+
+            @Override
+            public void onFail(int errorCode, @NotNull String errorMsg) {
+                defaultCallback.onFail(errorCode, errorMsg);
+            }
+        });
+    }
 
     /**
      * 加入游戏房间
@@ -132,7 +154,6 @@ public class GameManager {
     }
 
     public void exitGameRoom(BaseEMCallBack baseEMCallBack) {
-        EventBus.getDefault().unregister(this);
         this.eventListener = null;
         game = null;
 
@@ -146,15 +167,15 @@ public class GameManager {
     public String getRoomId() {
         return group.getGroupId();
     }
-    public String getRoomMaster(){
-        return group.getOwnerUserId();
-    }
 
     public boolean isOwner(){
         return isOwner;
     }
 
-    public void getMemberList(final DefaultCallback<List<User>> defaultCallback) {
+    public String getRoomMaster(){
+        return group.getOwnerUserId();
+    }
+    public void getRoomMemberList(final DefaultCallback<List<User>> defaultCallback) {
         IMManager.getInstance().getGroupMemberListFromServer(GameManager.getInstance().getRoomId(), new DefaultCallback<List<User>>() {
             @Override
             public void onSuccess(List<User> value) {
@@ -210,6 +231,10 @@ public class GameManager {
                 }
             });
         }
+    }
+
+    public void endGame(){
+        EventBus.getDefault().unregister(this);
     }
 
     public void doMagic(final Game.Card card) {
@@ -311,17 +336,7 @@ public class GameManager {
             if (message.getChatId().equals(group.getGroupId())) {
                 //该群来消息了，做些什么？
                 //如果是房主的游戏发牌，更新界面
-                if (game == null && message.getAuthorId().equals(group.getOwnerUserId())) {
-                    try {
-                        game.postCard(Game.toCardList(message.getContent()));
-                        eventListener.postCard();
-                        continue;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                } else if (game != null && game.getStatus() == Game.STATUS.WAIT_FOR_POST_CARD && message.getAuthorId().equals(group.getOwnerUserId())) {
+                if (game.getStatus() == Game.STATUS.WAIT_FOR_POST_CARD && message.getAuthorId().equals(group.getOwnerUserId())) {
                     try {
                         game.postCard(Game.toCardList(message.getContent()));
                         eventListener.postCard();
