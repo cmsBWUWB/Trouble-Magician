@@ -142,7 +142,14 @@ public class IMManager {
      * 登出
      */
     public void logout(final BaseEMCallBack callBack) {
-        emClient.logout(true,callBack);
+        emClient.logout(true,new BaseEMCallBack()
+        {
+            @Override
+            public void onSuccess() {
+                callBack.onSuccess();
+                onLogout();
+            }
+        });
     }
 
     private void onLoginSuccess() {
@@ -150,13 +157,15 @@ public class IMManager {
         emGroupManager = emClient.groupManager();
         emContactManager = emClient.contactManager();
         currentLoginUser = new User(emClient.getCurrentUser(), "");
-        UserManager.INSTANCE.setCurrentUser(currentLoginUser);
+        if (UserManager.INSTANCE.getCurrentUser() == null) {
+            UserManager.INSTANCE.saveCurrentUser(currentLoginUser);
+        }
         setListener();
     }
 
     private void onLogout() {
         unsetListener();
-        UserManager.INSTANCE.setCurrentUser(null);
+        UserManager.INSTANCE.clearCurrentUser();
         currentLoginUser = null;
     }
 

@@ -118,6 +118,7 @@ public class ProfileFragment extends BaseFragment {
     }
 
     private void uploadFileToServer(Uri uri) {
+        showProgressDialog(R.string.hint_updating);
         final String filePath = FileUtils.getFilePathByUri(CoreManager.getContext(), uri);
         if (filePath == null) {
             KLog.e("filePath is null");
@@ -135,6 +136,7 @@ public class ProfileFragment extends BaseFragment {
                         //更新头像失败
                         KLog.e("errorCode = " + errorCode);
                         showToast(errorMsg);
+                        dismissProgressDialog();
                     }
 
                     @Override
@@ -146,6 +148,7 @@ public class ProfileFragment extends BaseFragment {
                                 .transform(new CircleCrop())
                                 .error(R.drawable.icon_default_head)
                                 .into(iv_head);
+                        dismissProgressDialog();
                     }
                 });
             }
@@ -153,6 +156,7 @@ public class ProfileFragment extends BaseFragment {
             @Override
             public void onFail(int errorCode, @NotNull String errorMsg) {
                 showToast(errorMsg);
+                dismissProgressDialog();
             }
         });
     }

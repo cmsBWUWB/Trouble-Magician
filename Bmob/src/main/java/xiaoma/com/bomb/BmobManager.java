@@ -37,8 +37,18 @@ public class BmobManager {
         user.signUp(listener);
     }
 
-    public <T extends BmobObject> void saveToServer(T user, SaveListener<String> listener) {
-        user.save(listener);
+    public <T extends BmobObject> void saveToServer(T user, final DefaultCallback<String> callback) {
+        user.save(new SaveListener<String>() {
+            @Override
+            public void done(String s, BmobException e) {
+                if (e == null) {
+                    callback.onSuccess(s);
+                } else {
+                    e.printStackTrace();
+                    callback.onFail(e.getErrorCode(), e.getMessage());
+                }
+            }
+        });
     }
 
     public <T extends BmobObject> void update(T t, final DefaultCallback<Object> callback) {

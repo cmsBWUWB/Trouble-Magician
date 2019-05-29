@@ -53,7 +53,7 @@ class GsonUtils{
             val gson = Gson()
             try {
                 return gson.fromJson<T>(json, type)
-            } catch (e: JsonSyntaxException) {
+            } catch (e: Exception) {
                 KLog.json(json)
                 e.printStackTrace()
             }

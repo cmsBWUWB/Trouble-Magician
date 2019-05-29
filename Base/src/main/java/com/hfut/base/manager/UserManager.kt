@@ -1,8 +1,13 @@
 package com.hfut.base.manager
 
 import android.text.TextUtils
+import com.hfut.base.application.CoreManager
+import com.hfut.base.model.SPKeys
 import com.hfut.imlibrary.model.User
 import com.hfut.utils.callbacks.DefaultCallback
+import com.hfut.utils.utils.GsonUtils
+import com.hfut.utils.utils.SPUtils
+import com.socks.library.KLog
 import xiaoma.com.bomb.BmobManager
 
 /**
@@ -10,7 +15,7 @@ import xiaoma.com.bomb.BmobManager
  *
  */
 object UserManager{
-    var currentUser: User? = null
+    var currentUser: User? = getUserFromCache()
     var userId: String? = currentUser?.userId
 
     fun uploadUserIcon(path: String,callback : DefaultCallback<Any>) {
@@ -18,10 +23,75 @@ object UserManager{
         if(!TextUtils.equals(prePath,path)){
             currentUser?.picPath = path
             BmobManager.getInstance().update(currentUser,callback)
+            currentUser?.let { updateUserToCache(it) }
         }
     }
 
     fun getUserIcon():String {
         return currentUser?.picPath ?: ""
+    }
+
+    private fun getUserFromCache(): User? {
+        val str:String = SPUtils.get(CoreManager.getContext(), SPKeys.KEY_USER, "") as String
+        KLog.json(UserManager.javaClass.simpleName, str)
+        return GsonUtils.fromJson(str, User::class.java)
+    }
+
+    /**
+     * 存储用户数据到缓存与服务器
+     */
+    fun saveCurrentUser(user: User){
+        currentUser = user
+        KLog.i(UserManager.javaClass.simpleName,"save start,objectId=${user.objectId}")
+        BmobManager.getInstance().saveToServer(user, object : DefaultCallback<String> {
+            override fun onSuccess(value: String) {
+                KLog.i(UserManager.javaClass.simpleName,"save success,value = $value,objectId=${user.objectId}")
+                //之所以放在onSuccess里保存到SP，是由于保存之后，user的objectId才会确认
+                val userJson = GsonUtils.toJson(user)
+                if(userJson.isNotEmpty()) SPUtils.putImmediatly(CoreManager.getContext(), SPKeys.KEY_USER, userJson)
+            }
+
+            override fun onFail(errorCode: Int, errorMsg: String) {
+                KLog.e(UserManager.javaClass.simpleName,"errorCode = $errorCode,errorMsg = $errorMsg" )
+                //重复上传,则改为更新User
+                if (errorCode == 401) {
+                    updateUserToServer(user)
+                }
+            }
+
+        })
+    }
+
+    /**
+     * 更新用户数据到缓存
+     */
+    private fun updateUserToCache(user: User) {
+        currentUser = user
+        val userJson = GsonUtils.toJson(user)
+        if(userJson.isNotEmpty()) SPUtils.putImmediatly(CoreManager.getContext(), SPKeys.KEY_USER, userJson)
+    }
+
+    /**
+     * 更新用户数据到服务器
+     */
+    fun updateUserToServer(user: User) {
+        BmobManager.getInstance().update(user, object : DefaultCallback<Any> {
+            override fun onSuccess(value: Any) {
+                KLog.i(UserManager.javaClass.simpleName,"update success")
+            }
+
+            override fun onFail(errorCode: Int, errorMsg: String) {
+                KLog.e(UserManager.javaClass.simpleName,"errorCode = $errorCode,errorMsg = $errorMsg" )
+            }
+
+        })
+    }
+
+    /**
+     * 清空缓存用户数据
+     */
+    fun clearCurrentUser(): Boolean{
+        currentUser = null
+        return SPUtils.remove(CoreManager.getContext(), SPKeys.KEY_USER)
     }
 }

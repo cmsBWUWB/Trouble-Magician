@@ -13,7 +13,6 @@ import com.hfut.utils.thread.ThreadDispatcher;
 
 import java.lang.ref.WeakReference;
 
-import xiaoma.com.bomb.BmobManager;
 
 public class SplashActivity extends PermissionActivity {
     private MyHandler myHandler;
@@ -40,13 +39,6 @@ public class SplashActivity extends PermissionActivity {
             }
         };
         ThreadDispatcher.getInstance().postBusinessRunnableDelayed(businessRunnable, 1000);
-    }
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //初始化Bmob服务
-        BmobManager.getInstance().init(this);
     }
 
     @Override
