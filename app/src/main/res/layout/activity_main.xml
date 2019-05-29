@@ -23,7 +23,7 @@
         <TextView
             android:id="@+id/tv_game"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
             android:onClick="changeFragment"
@@ -32,7 +32,7 @@
         <TextView
             android:id="@+id/tv_socia"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
             android:onClick="changeFragment"
@@ -41,7 +41,7 @@
         <TextView
             android:id="@+id/tv_profile"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
             android:onClick="changeFragment"
