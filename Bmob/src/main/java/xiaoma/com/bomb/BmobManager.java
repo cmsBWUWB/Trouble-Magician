@@ -4,14 +4,19 @@ import android.content.Context;
 
 import com.hfut.utils.callbacks.DefaultCallback;
 import com.hfut.utils.utils.FileUtils;
+import com.socks.library.KLog;
+
+import org.json.JSONArray;
 
 import java.io.File;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobObject;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
@@ -79,6 +84,31 @@ public class BmobManager {
                 } else {
                     e.printStackTrace();
                     callback.onFail(e.getErrorCode(), e.getMessage());
+                }
+            }
+        });
+    }
+
+    public void queryData(String tableName, String[] keys, String[] values,final DefaultCallback<String> defaultCallback) {
+        BmobQuery query = new BmobQuery(tableName);
+        if (keys.length != values.length) {
+            throw new IllegalArgumentException("keys.length is different with values length!");
+        }
+        for (int i = 0; i < keys.length; i++) {
+            String key = keys[i];
+            String value = values[i];
+            query.addWhereEqualTo(key, value);
+        }
+        query.findObjectsByTable(new QueryListener<JSONArray>() {
+            @Override
+            public void done(JSONArray jsonArray, BmobException e) {
+                if (e == null) {
+                    final String str = jsonArray.toString();
+                    KLog.i("query data success" + "jsonArray = " + str);
+                    defaultCallback.onSuccess(str);
+                } else {
+                    KLog.e("errorCode = " + e.getErrorCode() + "; msg = " + e.getMessage());
+                    defaultCallback.onFail(e.getErrorCode(), e.getMessage());
                 }
             }
         });

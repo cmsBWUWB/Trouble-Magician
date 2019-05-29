@@ -82,6 +82,7 @@ public class IMManager {
         emClient.init(context, options);
         if (isLogin()) {
             onLoginSuccess();
+            UserManager.INSTANCE.updateUserFromServer();
         }
     }
 

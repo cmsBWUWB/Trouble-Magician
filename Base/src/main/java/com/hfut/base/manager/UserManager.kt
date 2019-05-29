@@ -38,6 +38,24 @@ object UserManager{
     }
 
     /**
+     * 从服务器更新用户数据
+     */
+    fun updateUserFromServer() {
+        userId?.let { BmobManager.getInstance().queryData("User", Array(1) { "userId" }, Array(1) { userId as String }, object : DefaultCallback<String> {
+            override fun onSuccess(value: String) {
+                val array = GsonUtils.fromJsonToList(value,Array<User>::class.java)
+                val user = array.get(0)
+                KLog.v(UserManager.javaClass.simpleName, "update user $user")
+                updateUserToCache(user)
+            }
+
+            override fun onFail(errorCode: Int, errorMsg: String) {
+
+            }
+        })}
+    }
+
+    /**
      * 存储用户数据到缓存与服务器
      */
     fun saveCurrentUser(user: User){
