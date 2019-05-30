@@ -81,9 +81,26 @@ object UserManager{
     }
 
     /**
+     * 存储用户数据到服务器
+     */
+    fun saveUserToServer(user: User){
+        KLog.i(UserManager.javaClass.simpleName,"save start,objectId=${user.objectId}")
+        BmobManager.getInstance().saveToServer(user, object : DefaultCallback<String> {
+            override fun onSuccess(value: String) {
+                KLog.i(UserManager.javaClass.simpleName,"save success,value = $value,objectId=${user.objectId}")
+            }
+
+            override fun onFail(errorCode: Int, errorMsg: String) {
+                KLog.e(UserManager.javaClass.simpleName,"errorCode = $errorCode,errorMsg = $errorMsg" )
+            }
+
+        })
+    }
+
+    /**
      * 更新用户数据到缓存
      */
-    private fun updateUserToCache(user: User) {
+    fun updateUserToCache(user: User) {
         currentUser = user
         val userJson = GsonUtils.toJson(user)
         if(userJson.isNotEmpty()) SPUtils.putImmediatly(CoreManager.getContext(), SPKeys.KEY_USER, userJson)

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,11 +7,23 @@
     android:orientation="vertical"
     tools:context=".LoginActivity">
 
+    <ImageView
+        android:id="@+id/iv_head"
+        android:layout_width="@dimen/profile_head_icon_size"
+        android:layout_height="@dimen/profile_head_icon_size" />
+
     <EditText
         android:id="@+id/et_userId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hint_user_id"
+        android:maxLength="16" />
+
+    <EditText
+        android:id="@+id/et_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_username"
         android:maxLength="16" />
 
     <EditText
@@ -23,28 +34,18 @@
         android:inputType="textPassword"
         android:maxLength="16" />
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="50dp">
+        android:layout_marginTop="50dp"
+        android:gravity="center">
         <Button
-            android:layout_marginEnd="30dp"
-            android:text="@string/login"
-            android:id="@+id/bt_login"
-            android:layout_centerInParent="true"
+            android:id="@+id/bt_register"
+            android:text="@string/register"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onclick"/>
-        <TextView
-            android:id="@+id/tv_register"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/bt_login"
-            android:layout_centerVertical="true"
-            android:text="@string/go_to_register"
-            android:onClick="onclick"/>
-    </RelativeLayout>
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
 
 </LinearLayout>

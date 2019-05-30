@@ -83,6 +83,9 @@ public class IMManager {
         if (isLogin()) {
             onLoginSuccess();
             UserManager.INSTANCE.updateUserFromServer();
+        } else {
+            //未登录先清空当前用户缓存
+            UserManager.INSTANCE.clearCurrentUser();
         }
     }
 
@@ -159,7 +162,7 @@ public class IMManager {
         emContactManager = emClient.contactManager();
         currentLoginUser = new User(emClient.getCurrentUser(), "");
         if (UserManager.INSTANCE.getCurrentUser() == null) {
-            UserManager.INSTANCE.saveCurrentUser(currentLoginUser);
+            UserManager.INSTANCE.updateUserToCache(currentLoginUser);
         }
         setListener();
     }

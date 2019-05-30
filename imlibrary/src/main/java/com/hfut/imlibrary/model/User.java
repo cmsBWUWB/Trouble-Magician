@@ -13,6 +13,7 @@ public class User extends BmobObject {
     private String userId;
     private String username;
     private String picPath;
+    private String password;
 
     public User(String userId, String username) {
         this.userId = userId;
@@ -38,6 +39,14 @@ public class User extends BmobObject {
 
     public void setPicPath(String picPath) {
         this.picPath = picPath;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @NonNull

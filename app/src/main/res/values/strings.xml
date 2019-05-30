@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">出包魔法师</string>
-    <string name="hint_username">请输入用户名（小写字母）</string>
+    <string name="hint_user_id">请输入账号</string>
+    <string name="go_to_register">前往注册</string>
+    <string name="hint_username">请输入用户名</string>
     <string name="hint_password">请输入密码</string>
     <string name="game">游戏</string>
     <string name="socia">社交</string>
@@ -29,6 +31,9 @@
     <string name="do_magic">施放魔法</string>
     <string name="start_game">开始游戏</string>
     <string name="player_point">获得分数：%s</string>
-    <string name="hint_updating">正在上传中，请稍后</string>
+    <string name="hint_updating">正在操作中，请稍后</string>
     <string name="hint_loading">正在加载中，请稍后</string>
+    <string name="login_success">登录成功</string>
+    <string name="login_fail">登录失败</string>
+    <string name="input_error">输入异常，请确认异常项</string>
 </resources>

@@ -38,6 +38,7 @@
         <activity android:name=".socia.ChatActivity" />
         <activity android:name=".game.GameRoomActivity" />
         <activity android:name=".game.GameActivity" />
+        <activity android:name=".RegisterActivity" />
     </application>
 
 </manifest>
