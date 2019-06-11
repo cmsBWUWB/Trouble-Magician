@@ -5,6 +5,7 @@ import android.app.Application;
 import com.hfut.base.application.CoreManager;
 import com.hfut.base.manager.IMManager;
 import com.hfut.utils.utils.Utils;
+import com.hfut.voice.VoiceManager;
 import com.socks.library.KLog;
 
 import xiaoma.com.bomb.BmobManager;
@@ -21,5 +22,7 @@ public class MyApplication extends Application {
         IMManager.getInstance().init(this);
         //初始化KLog
         KLog.init(Utils.isDebuggable(this));
+        //初始化语音
+        VoiceManager.INSTANCE.init(this);
     }
 }

@@ -36,4 +36,5 @@
     <string name="login_success">登录成功</string>
     <string name="login_fail">登录失败</string>
     <string name="input_error">输入异常，请确认异常项</string>
+    <string name="mode_speak">语音模式</string>
 </resources>

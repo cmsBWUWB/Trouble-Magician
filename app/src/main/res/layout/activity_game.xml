@@ -28,11 +28,24 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"/>
 
-        <Spinner
-            android:id="@+id/sp_card_list"
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:entries="@array/array_magic_list"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cb_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_speak" />
+
+            <Spinner
+                android:id="@+id/sp_card_list"
+                android:layout_width="match_parent"
+                android:entries="@array/array_magic_list"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
         <Button
             android:id="@+id/bt_do_magic"
             android:text="@string/do_magic"

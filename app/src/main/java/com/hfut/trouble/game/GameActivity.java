@@ -1,8 +1,11 @@
 package com.hfut.trouble.game;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Spinner;
 
@@ -11,6 +14,7 @@ import com.hfut.gamelibrary.Game;
 import com.hfut.gamelibrary.GameManager;
 import com.hfut.base.manager.IMManager;
 import com.hfut.trouble.R;
+import com.hfut.voice.VoiceManager;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -29,6 +33,8 @@ public class GameActivity extends BaseActivity implements GameManager.EventListe
     Button btThrowDice;
     @BindView(R.id.bt_pass)
     Button btPass;
+    @BindView(R.id.cb_mode)
+    CheckBox cbMode;
 
     PlayerAdapter playerAdapter;
 
@@ -61,6 +67,7 @@ public class GameActivity extends BaseActivity implements GameManager.EventListe
         GameManager.getInstance().endGame();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setListener() {
         btDoMagic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,6 +75,27 @@ public class GameActivity extends BaseActivity implements GameManager.EventListe
                 Game.Card card = Game.Card.indexOf(spCard.getSelectedItemPosition());
                 GameManager.getInstance().doMagic(card);
                 showGame(game);
+            }
+        });
+        btDoMagic.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int action = event.getAction();
+                //这里好像有问题~
+                if (!cbMode.isChecked()) {
+                    return false;
+                }
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        VoiceManager.INSTANCE.startListener();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        VoiceManager.INSTANCE.stopListener();
+                        return true;
+                }
+                return false;
             }
         });
         btThrowDice.setOnClickListener(new View.OnClickListener() {
