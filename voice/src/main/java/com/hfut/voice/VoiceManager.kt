@@ -3,6 +3,8 @@ package com.hfut.voice
 import android.content.Context
 import android.os.Bundle
 import com.iflytek.cloud.*
+import com.iflytek.cloud.ui.RecognizerDialog
+import com.iflytek.cloud.ui.RecognizerDialogListener
 import com.socks.library.KLog
 
 /**
@@ -12,6 +14,7 @@ import com.socks.library.KLog
 object VoiceManager{
     const val TAG = "VoiceManager"
     var mRecognizer: SpeechRecognizer? = null
+    var mDialog : RecognizerDialog? = null
 
     fun init(context: Context){
         SpeechUtility.createUtility(context, "appid=${context.getString(R.string.app_key)}")
@@ -84,6 +87,27 @@ object VoiceManager{
         mRecognizer?.stopListening()
     }
 
+    fun showRecognizerDialog(context: Context) {
+        if (mDialog != null && mDialog!!.isShowing) {
+            KLog.e(TAG, "[startRecognizerDialog]mDialog is showing,drop this call")
+            return
+        }
+        mDialog = RecognizerDialog(context){ KLog.i("VoiceManager", "init code = $it")}
+        mDialog?.setListener(object : RecognizerDialogListener{
+            override fun onResult(result: RecognizerResult?, islast: Boolean) {
+                KLog.i(TAG, "[onResult]islast = $islast,str = ${result?.resultString}")
+            }
 
+            override fun onError(error: SpeechError?) {
+                KLog.i(TAG, "[onError]errorCode = ${error?.errorCode}")
+            }
+
+        })
+        mDialog?.show()
+    }
+
+    fun dismissRecognizerDialog() {
+        mDialog?.dismiss()
+    }
 
 }
