@@ -2,6 +2,7 @@
 
 buildscript {
     repositories {
+        maven{url 'http://maven.aliyun.com/nexus/content/groups/public/'}
         google()
         jcenter()
         mavenCentral()
@@ -15,12 +16,13 @@ buildscript {
 
 allprojects {
     repositories {
+        maven{url 'http://maven.aliyun.com/nexus/content/groups/public/'}
         google()
-        jcenter()
         maven { url "https://raw.githubusercontent.com/HyphenateInc/Hyphenate-SDK-Android/master/repository" }
         //Bmob的maven仓库地址--必填
         maven { url "https://raw.github.com/bmob/bmob-android-sdk/master" }
         maven { url 'https://jitpack.io' }
+        jcenter()
     }
 }
 

@@ -13,7 +13,7 @@ import com.socks.library.KLog
  */
 object VoiceManager{
     const val TAG = "VoiceManager"
-    var mRecognizer: SpeechRecognizer? = null
+    private var mRecognizer: SpeechRecognizer? = null
     var mDialog : RecognizerDialog? = null
 
     fun init(context: Context){
