@@ -54,6 +54,8 @@ public class LoginActivity extends BaseActivity {
                     @Override
                     public void onSuccess() {
                         showToast(R.string.login_success);
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
                     }
 
                     @Override
