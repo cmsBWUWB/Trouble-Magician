@@ -4,6 +4,8 @@ import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.hfut.base.R;
+import com.hfut.base.application.CoreManager;
 import com.hfut.imlibrary.IMUtils;
 import com.hfut.imlibrary.OperateCallBack;
 import com.hfut.imlibrary.event.MessageReceivedEvent;
@@ -14,6 +16,7 @@ import com.hfut.imlibrary.listener.GroupChangeListener;
 import com.hfut.imlibrary.listener.MessageReceivedListener;
 import com.hfut.imlibrary.model.*;
 import com.hfut.utils.callbacks.DefaultCallback;
+import com.hfut.utils.callbacks.NoSucResultCallback;
 import com.hfut.utils.utils.Utils;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMValueCallBack;
@@ -111,9 +114,9 @@ public class IMManager {
      * 登录
      */
     public void login(final String userName, String password,
-                      final OperateCallBack callBack) {
+                      final NoSucResultCallback callBack) {
         if (TextUtils.isEmpty(userName) || TextUtils.isEmpty(password)) {
-            callBack.onFailure();
+            callBack.onFail(-1, CoreManager.getContext().getString(R.string.login_with_empty));
             return;
         }
         emClient.login(userName, password, new EMCallBack() {
@@ -126,7 +129,7 @@ public class IMManager {
             @Override
             public void onError(int code, String error) {
                 Log.e(TAG, "onLoginError: " + error);
-                callBack.onFailure();
+                callBack.onFail(code, error);
             }
 
             @Override

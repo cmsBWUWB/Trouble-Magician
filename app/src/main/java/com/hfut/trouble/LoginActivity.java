@@ -8,9 +8,11 @@ import android.widget.EditText;
 
 import com.hfut.base.activity.BaseActivity;
 import com.hfut.base.manager.IMManager;
-import com.hfut.imlibrary.OperateCallBack;
+import com.hfut.utils.callbacks.NoSucResultCallback;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
+
+import org.jetbrains.annotations.NotNull;
 
 import butterknife.BindView;
 
@@ -45,12 +47,13 @@ public class LoginActivity extends BaseActivity {
         final String userId = etUserId.getText().toString();
         final String password = etPassword.getText().toString();
         if (TextUtils.isEmpty(userId) || TextUtils.isEmpty(password)) {
+            showToast(R.string.login_with_empty);
             return;
         }
         ThreadDispatcher.getInstance().postToBusinessThread(new BusinessRunnable() {
             @Override
             public void doWorkInRun() {
-                IMManager.getInstance().login(userId, password, new OperateCallBack() {
+                IMManager.getInstance().login(userId, password, new NoSucResultCallback() {
                     @Override
                     public void onSuccess() {
                         showToast(R.string.login_success);
@@ -59,8 +62,8 @@ public class LoginActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onFailure() {
-                        showToast(R.string.login_fail);
+                    public void onFail(int errorCode, @NotNull String errorMsg) {
+                        showToast(String.format(getString(R.string.error_code_hint), errorCode, errorMsg));
                     }
                 });
             }

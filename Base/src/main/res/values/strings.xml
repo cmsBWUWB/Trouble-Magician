@@ -4,4 +4,6 @@
     <string name="cancel">取消</string>
     <string name="permission_denied">没有权限就别用了吧，再见</string>
     <string name="update_head_success">更新头像成功</string>
+    <string name="login_with_empty">用户名和密码不能为空哦小伙子</string>
+    <string name="error_code_hint">错误码：%d，错误信息：%s</string>
 </resources>
