@@ -16,7 +16,7 @@ import com.hfut.imlibrary.listener.BaseGroupChangeListener;
 import com.hfut.imlibrary.model.User;
 import com.hfut.trouble.R;
 import com.hfut.utils.callbacks.DefaultCallback;
-import com.socks.library.KLog;
+import com.hfut.utils.utils.log.LogPrint;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -77,7 +77,7 @@ public class GameRoomActivity extends BaseActivity {
             @Override
             public void onFail(int errorCode, @NotNull String errorMsg) {
                 showToast(errorMsg);
-                KLog.i("code = " + errorCode + ";errorMessage = " + errorMsg);
+                LogPrint.i("code = " + errorCode + ";errorMessage = " + errorMsg);
             }
         });
     }
@@ -88,27 +88,27 @@ public class GameRoomActivity extends BaseActivity {
             public void onRequestToJoinAccepted(String groupId, String groupName, String accepter) {
                 super.onRequestToJoinAccepted(groupId, groupName, accepter);
                 syncGroupMember();
-                KLog.i( "groupName = " + groupName);
+                LogPrint.i( "groupName = " + groupName);
             }
 
             @Override
             public void onInvitationAccepted(String groupId, String invitee, String reason) {
                 super.onInvitationAccepted(groupId, invitee, reason);
                 syncGroupMember();
-                KLog.i("groupId = " + groupId);
+                LogPrint.i("groupId = " + groupId);
             }
 
             @Override
             public void onMemberJoined(String groupId, String member) {
                 super.onMemberJoined(groupId, member);
-                KLog.i("groupId = " + groupId + ";member = " + member);
+                LogPrint.i("groupId = " + groupId + ";member = " + member);
                 syncGroupMember();
             }
 
             @Override
             public void onMemberExited(String groupId, String member) {
                 super.onMemberExited(groupId, member);
-                KLog.i("groupId = " + groupId + ";member = " + member);
+                LogPrint.i("groupId = " + groupId + ";member = " + member);
                 syncGroupMember();
             }
         };
@@ -129,14 +129,14 @@ public class GameRoomActivity extends BaseActivity {
             public void onSuccess() {
                 super.onSuccess();
                 showToast(R.string.exit_group_success);
-                KLog.i("exit group success");
+                LogPrint.i("exit group success");
             }
 
             @Override
             public void onError(int code, String error) {
                 super.onError(code, error);
                 showToast(R.string.exit_group_fail);
-                KLog.i("code = " + code + ";errorMessage = " + error);
+                LogPrint.i("code = " + code + ";errorMessage = " + error);
             }
         });
         GameManager.getInstance().removeGroupChangeListener(mGroupChangeListener);

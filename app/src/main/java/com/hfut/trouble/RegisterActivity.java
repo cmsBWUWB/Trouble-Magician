@@ -21,7 +21,7 @@ import com.hfut.utils.callbacks.DefaultCallback;
 import com.hfut.utils.thread.BusinessRunnable;
 import com.hfut.utils.thread.ThreadDispatcher;
 import com.hfut.utils.utils.FileUtils;
-import com.socks.library.KLog;
+import com.hfut.utils.utils.log.LogPrint;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -108,7 +108,7 @@ public class RegisterActivity extends BaseActivity {
             case RequestCodes.TAKE_PHOTO:
                 final Uri uri = CameraImageBean.INSTANCE.getPath();
                 if (uri == null) {
-                    KLog.e("uri is null!");
+                    LogPrint.e("uri is null!");
                     return;
                 }
                 showAndSaveHeadIcon(uri);
@@ -117,7 +117,7 @@ public class RegisterActivity extends BaseActivity {
                 //这里的uri是content开头，需要解析成file开头的才可以正常使用
                 final Uri pickUri = data.getData();
                 if (pickUri == null) {
-                    KLog.e("uri is null!");
+                    LogPrint.e("uri is null!");
                     return;
                 }
                 showAndSaveHeadIcon(pickUri);
@@ -140,7 +140,7 @@ public class RegisterActivity extends BaseActivity {
         showProgressDialog(R.string.hint_updating);
         final String filePath = FileUtils.getFilePathByUri(CoreManager.getContext(), uri);
         if (filePath == null) {
-            KLog.e("filePath is null");
+            LogPrint.e("filePath is null");
             return;
         }
         File file = new File(filePath);

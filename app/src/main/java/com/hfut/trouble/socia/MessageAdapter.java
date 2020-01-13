@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.hfut.imlibrary.model.Message;
 import com.hfut.trouble.R;
-import com.socks.library.KLog;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -15,7 +15,7 @@ import com.hfut.base.manager.IMManager;
 import com.hfut.imlibrary.model.Group;
 import com.hfut.trouble.game.GameRoomActivity;
 import com.hfut.utils.callbacks.DefaultCallback;
-import com.socks.library.KLog;
+import com.hfut.utils.utils.log.LogPrint;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,13 +42,13 @@ public class GameFragment extends BaseFragment {
                     intent.putExtra(GameRoomActivity.TAG_GROUP, group);
                     startActivity(intent);
                 } else {
-                    KLog.e("group is null");
+                    LogPrint.e("group is null");
                 }
             }
 
             @Override
             public void onFail(int errorCode, @NotNull String errorMsg) {
-                KLog.e("errorCode = " + errorCode + "; errorMsg = " + errorMsg);
+                LogPrint.e("errorCode = " + errorCode + "; errorMsg = " + errorMsg);
             }
         });
     }
@@ -103,7 +103,7 @@ public class GameFragment extends BaseFragment {
 
             @Override
             public void onFail(int errorCode, @NotNull String errorMsg) {
-                KLog.e("errorMsg = " + errorMsg);
+                LogPrint.e("errorMsg = " + errorMsg);
             }
         });
     }

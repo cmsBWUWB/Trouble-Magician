@@ -7,7 +7,7 @@ import com.hfut.imlibrary.model.User
 import com.hfut.utils.callbacks.DefaultCallback
 import com.hfut.utils.utils.GsonUtils
 import com.hfut.utils.utils.SPUtils
-import com.socks.library.KLog
+import com.hfut.utils.utils.log.LogPrint
 import xiaoma.com.bomb.BmobManager
 
 /**
@@ -33,7 +33,7 @@ object UserManager{
 
     private fun getUserFromCache(): User? {
         val str:String = SPUtils.get(CoreManager.getContext(), SPKeys.KEY_USER, "") as String
-        KLog.json(UserManager.javaClass.simpleName, str)
+        LogPrint.json(UserManager.javaClass.simpleName, str)
         return GsonUtils.fromJson(str, User::class.java)
     }
 
@@ -45,7 +45,7 @@ object UserManager{
             override fun onSuccess(value: String) {
                 val array = GsonUtils.fromJsonToList(value,Array<User>::class.java)
                 val user = array[0]
-                KLog.v(UserManager.javaClass.simpleName, "update {$user}")
+                LogPrint.v(UserManager.javaClass.simpleName, "update {$user}")
                 updateUserToCache(user)
             }
 
@@ -60,17 +60,17 @@ object UserManager{
      */
     fun saveCurrentUser(user: User){
         currentUser = user
-        KLog.i(UserManager.javaClass.simpleName,"save start,objectId=${user.objectId}")
+        LogPrint.i(UserManager.javaClass.simpleName,"save start,objectId=${user.objectId}")
         BmobManager.getInstance().saveToServer(user, object : DefaultCallback<String> {
             override fun onSuccess(value: String) {
-                KLog.i(UserManager.javaClass.simpleName,"save success,value = $value,objectId=${user.objectId}")
+                LogPrint.i(UserManager.javaClass.simpleName,"save success,value = $value,objectId=${user.objectId}")
                 //之所以放在onSuccess里保存到SP，是由于保存之后，user的objectId才会确认
                 val userJson = GsonUtils.toJson(user)
                 if(userJson.isNotEmpty()) SPUtils.putImmediatly(CoreManager.getContext(), SPKeys.KEY_USER, userJson)
             }
 
             override fun onFail(errorCode: Int, errorMsg: String) {
-                KLog.e(UserManager.javaClass.simpleName,"errorCode = $errorCode,errorMsg = $errorMsg" )
+                LogPrint.e(UserManager.javaClass.simpleName,"errorCode = $errorCode,errorMsg = $errorMsg" )
                 //重复上传,则改为更新User
                 if (errorCode == 401) {
                     updateUserToServer(user)
@@ -84,14 +84,14 @@ object UserManager{
      * 存储用户数据到服务器
      */
     fun saveUserToServer(user: User){
-        KLog.i(UserManager.javaClass.simpleName,"save start,objectId=${user.objectId}")
+        LogPrint.i(UserManager.javaClass.simpleName,"save start,objectId=${user.objectId}")
         BmobManager.getInstance().saveToServer(user, object : DefaultCallback<String> {
             override fun onSuccess(value: String) {
-                KLog.i(UserManager.javaClass.simpleName,"save success,value = $value,objectId=${user.objectId}")
+                LogPrint.i(UserManager.javaClass.simpleName,"save success,value = $value,objectId=${user.objectId}")
             }
 
             override fun onFail(errorCode: Int, errorMsg: String) {
-                KLog.e(UserManager.javaClass.simpleName,"errorCode = $errorCode,errorMsg = $errorMsg" )
+                LogPrint.e(UserManager.javaClass.simpleName,"errorCode = $errorCode,errorMsg = $errorMsg" )
             }
 
         })
@@ -112,11 +112,11 @@ object UserManager{
     fun updateUserToServer(user: User) {
         BmobManager.getInstance().update(user, object : DefaultCallback<Any> {
             override fun onSuccess(value: Any) {
-                KLog.i(UserManager.javaClass.simpleName,"update success")
+                LogPrint.i(UserManager.javaClass.simpleName,"update success")
             }
 
             override fun onFail(errorCode: Int, errorMsg: String) {
-                KLog.e(UserManager.javaClass.simpleName,"errorCode = $errorCode,errorMsg = $errorMsg" )
+                LogPrint.e(UserManager.javaClass.simpleName,"errorCode = $errorCode,errorMsg = $errorMsg" )
             }
 
         })

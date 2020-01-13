@@ -15,7 +15,7 @@ import com.hfut.base.manager.IMManager;
 import com.hfut.imlibrary.listener.BaseEMCallBack;
 import com.hfut.trouble.profile.ProfileFragment;
 import com.hfut.trouble.socia.SociaFragment;
-import com.socks.library.KLog;
+import com.hfut.utils.utils.log.LogPrint;
 
 import butterknife.BindView;
 
@@ -24,7 +24,7 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.tv_game)
     public TextView tvGame;
     @BindView(R.id.tv_socia)
-    public TextView tvSocia;
+    public TextView tvSocial;
     @BindView(R.id.tv_profile)
     public TextView tvProfile;
 
@@ -93,7 +93,7 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onError(int code, String error) {
                                 super.onError(code, error);
-                                KLog.e("code = " + code + "; error = " + error);
+                                LogPrint.e("code = " + code + "; error = " + error);
                                 showToast(R.string.error_hint);
                             }
                         });

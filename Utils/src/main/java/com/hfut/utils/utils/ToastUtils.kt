@@ -22,11 +22,11 @@ class ToastUtils{
 
         fun show(context: Context, content: String, duration: Int = Toast.LENGTH_SHORT) {
             val handler = Handler(Looper.getMainLooper())
-            handler.post({
+            handler.post{
                 toast?.cancel()
                 toast = Toast.makeText(context, content, duration)
                 toast?.show()
-            })
+            }
         }
 
         fun showTestToast(context : Context, resId :Int, duration: Int = Toast.LENGTH_SHORT){

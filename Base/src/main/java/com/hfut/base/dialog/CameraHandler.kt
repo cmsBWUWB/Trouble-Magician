@@ -18,7 +18,7 @@ import com.hfut.base.R
 import com.hfut.base.model.CameraImageBean
 import com.hfut.base.model.RequestCodes
 import com.hfut.utils.utils.FileUtils
-import com.socks.library.KLog
+import com.hfut.utils.utils.log.LogPrint
 import java.io.File
 
 /**
@@ -65,7 +65,7 @@ class CameraHandler(private val context: Context) : View.OnClickListener {
         val tempFile = File(FileUtils.CAMERA_PHOTO_DIR, currentPhotoName)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             //通过FileProvider获取文件的Uri
-            KLog.i(tempFile.path)
+            LogPrint.i(tempFile.path)
             val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", tempFile)
             CameraImageBean.path = Uri.fromFile(tempFile)
             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)

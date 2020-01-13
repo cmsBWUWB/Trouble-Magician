@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.hfut.utils.callbacks.DefaultCallback;
 import com.hfut.utils.utils.FileUtils;
-import com.socks.library.KLog;
+import com.hfut.utils.utils.log.LogPrint;
 
 import org.json.JSONArray;
 
@@ -104,10 +104,10 @@ public class BmobManager {
             public void done(JSONArray jsonArray, BmobException e) {
                 if (e == null) {
                     final String str = jsonArray.toString();
-                    KLog.i("query data success" + "jsonArray = " + str);
+                    LogPrint.i("query data success" + "jsonArray = " + str);
                     defaultCallback.onSuccess(str);
                 } else {
-                    KLog.e("errorCode = " + e.getErrorCode() + "; msg = " + e.getMessage());
+                    LogPrint.e("errorCode = " + e.getErrorCode() + "; msg = " + e.getMessage());
                     defaultCallback.onFail(e.getErrorCode(), e.getMessage());
                 }
             }

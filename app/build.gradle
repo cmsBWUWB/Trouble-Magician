@@ -10,6 +10,7 @@ android {
         targetSdkVersion project.TARGET_SDK_VERSION as int
         versionCode project.APP_VERSION_CODE as int
         versionName "$APP_VERSION_NAME"
+        multiDexEnabled true
     }
     buildTypes {
         release {

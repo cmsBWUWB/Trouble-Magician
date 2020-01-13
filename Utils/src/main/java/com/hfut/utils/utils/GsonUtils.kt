@@ -3,7 +3,7 @@ package com.hfut.utils.utils
 import android.text.TextUtils
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import com.socks.library.KLog
+import com.hfut.utils.utils.log.LogPrint
 import java.lang.reflect.Type
 import java.util.*
 
@@ -54,7 +54,7 @@ class GsonUtils{
             try {
                 return gson.fromJson<T>(json, type)
             } catch (e: Exception) {
-                KLog.json(json)
+                LogPrint.json(json)
                 e.printStackTrace()
             }
 
@@ -73,7 +73,7 @@ class GsonUtils{
                 val ts = Arrays.asList(*arr)
                 return ArrayList(ts)
             } catch (e: JsonSyntaxException) {
-                KLog.json(json)
+                LogPrint.json(json)
                 e.printStackTrace()
                 return ArrayList()
             }

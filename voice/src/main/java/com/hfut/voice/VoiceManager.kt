@@ -2,10 +2,10 @@ package com.hfut.voice
 
 import android.content.Context
 import android.os.Bundle
+import com.hfut.utils.utils.log.LogPrint
 import com.iflytek.cloud.*
 import com.iflytek.cloud.ui.RecognizerDialog
 import com.iflytek.cloud.ui.RecognizerDialogListener
-import com.socks.library.KLog
 
 /**
  * Created by wzt on 2019/6/4
@@ -18,7 +18,7 @@ object VoiceManager{
 
     fun init(context: Context){
         SpeechUtility.createUtility(context, "appid=${context.getString(R.string.app_key)}")
-        mRecognizer = SpeechRecognizer.createRecognizer(context) { KLog.i("VoiceManager", "init code = $it") }
+        mRecognizer = SpeechRecognizer.createRecognizer(context) { LogPrint.i("VoiceManager", "init code = $it") }
     }
 
     fun startListener() {
@@ -39,7 +39,7 @@ object VoiceManager{
                  * @param data 录音数据
                  */
                 override fun onVolumeChanged(volume: Int, data: ByteArray?) {
-                    KLog.i(TAG, "[onVolumeChanged]volume = $volume")
+                    LogPrint.i(TAG, "[onVolumeChanged]volume = $volume")
                 }
 
                 /**
@@ -48,35 +48,35 @@ object VoiceManager{
                  * @param islast 是否最后一次结果标记
                  */
                 override fun onResult(result: RecognizerResult?, islast: Boolean) {
-                    KLog.i(TAG, "[onResult]islast = $islast,str = ${result?.resultString}")
+                    LogPrint.i(TAG, "[onResult]islast = $islast,str = ${result?.resultString}")
                 }
 
                 /**
                  * 调用开始录音函数后，会自动开启系统的录音 机，并在录音机开启后，会回调此函数
                  */
                 override fun onBeginOfSpeech() {
-                    KLog.i(TAG,"[onBeginOfSpeech]")
+                    LogPrint.i(TAG,"[onBeginOfSpeech]")
                 }
 
                 /**
                  * 事件扩展用接口，由具体业务进行约定
                  */
                 override fun onEvent(eventType: Int, arg1: Int, arg2: Int, obj: Bundle?) {
-                    KLog.i(TAG,"[onEvent]")
+                    LogPrint.i(TAG,"[onEvent]")
                 }
 
                 /**
                  * 结束说话 在SDK检测到音频的静音端点时，回调此函数（在录音模式或写音频模式下都会回调， 应用层主动调用SpeechRecognizer.stopListening()则不会回调此函数， 在识别出错时，可能不会回调此函数）。
                  */
                 override fun onEndOfSpeech() {
-                    KLog.i(TAG,"[onEndOfSpeech]")
+                    LogPrint.i(TAG,"[onEndOfSpeech]")
                 }
 
                 /**
                  * 错误回调 当此函数回调时，说明当次会话出现错误，会话自动结束，录音也会停止
                  */
                 override fun onError(error: SpeechError?) {
-                    KLog.i(TAG, "[onError]errorCode = ${error?.errorCode}")
+                    LogPrint.i(TAG, "[onError]errorCode = ${error?.errorCode}")
                 }
             })
 
@@ -89,17 +89,17 @@ object VoiceManager{
 
     fun showRecognizerDialog(context: Context) {
         if (mDialog != null && mDialog!!.isShowing) {
-            KLog.e(TAG, "[startRecognizerDialog]mDialog is showing,drop this call")
+            LogPrint.e(TAG, "[startRecognizerDialog]mDialog is showing,drop this call")
             return
         }
-        mDialog = RecognizerDialog(context){ KLog.i("VoiceManager", "init code = $it")}
+        mDialog = RecognizerDialog(context){ LogPrint.i("VoiceManager", "init code = $it")}
         mDialog?.setListener(object : RecognizerDialogListener{
             override fun onResult(result: RecognizerResult?, islast: Boolean) {
-                KLog.i(TAG, "[onResult]islast = $islast,str = ${result?.resultString}")
+                LogPrint.i(TAG, "[onResult]islast = $islast,str = ${result?.resultString}")
             }
 
             override fun onError(error: SpeechError?) {
-                KLog.i(TAG, "[onError]errorCode = ${error?.errorCode}")
+                LogPrint.i(TAG, "[onError]errorCode = ${error?.errorCode}")
             }
 
         })

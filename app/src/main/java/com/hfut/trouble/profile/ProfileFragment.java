@@ -24,7 +24,7 @@ import com.hfut.trouble.LoginActivity;
 import com.hfut.trouble.R;
 import com.hfut.utils.callbacks.DefaultCallback;
 import com.hfut.utils.utils.FileUtils;
-import com.socks.library.KLog;
+import com.hfut.utils.utils.log.LogPrint;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,7 +81,7 @@ public class ProfileFragment extends BaseFragment {
             @Override
             public void onError(int code, String error) {
                 super.onError(code, error);
-                KLog.e("code = " + code + "; error = " + error);
+                LogPrint.e("code = " + code + "; error = " + error);
             }
         });
     }
@@ -98,7 +98,7 @@ public class ProfileFragment extends BaseFragment {
             case RequestCodes.TAKE_PHOTO:
                 final Uri uri = CameraImageBean.INSTANCE.getPath();
                 if (uri == null) {
-                    KLog.e("uri is null!");
+                    LogPrint.e("uri is null!");
                     return;
                 }
                 uploadFileToServer(uri);
@@ -107,7 +107,7 @@ public class ProfileFragment extends BaseFragment {
                 //这里的uri是content开头，需要解析成file开头的才可以正常使用
                 final Uri pickUri = data.getData();
                 if (pickUri == null) {
-                    KLog.e("uri is null!");
+                    LogPrint.e("uri is null!");
                     return;
                 }
                 uploadFileToServer(pickUri);
@@ -121,7 +121,7 @@ public class ProfileFragment extends BaseFragment {
         showProgressDialog(R.string.hint_updating);
         final String filePath = FileUtils.getFilePathByUri(CoreManager.getContext(), uri);
         if (filePath == null) {
-            KLog.e("filePath is null");
+            LogPrint.e("filePath is null");
             return;
         }
         File file = new File(filePath);
@@ -134,7 +134,7 @@ public class ProfileFragment extends BaseFragment {
                     @Override
                     public void onFail(int errorCode, @NotNull String errorMsg) {
                         //更新头像失败
-                        KLog.e("errorCode = " + errorCode);
+                        LogPrint.e("errorCode = " + errorCode);
                         showToast(errorMsg);
                         dismissProgressDialog();
                     }

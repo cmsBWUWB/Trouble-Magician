@@ -3,11 +3,11 @@ package com.hfut.imlibrary.listener;
 import android.text.TextUtils;
 
 import com.hfut.imlibrary.event.GroupChangeEvent;
+import com.hfut.utils.utils.log.LogPrint;
 import com.hyphenate.EMGroupChangeListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMucSharedFile;
 import com.hyphenate.exceptions.HyphenateException;
-import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -27,7 +27,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onInvitationReceived(String groupId, String groupName, String inviter, String reason) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         //目前来讲，自动同意拉群邀请
         try {
             EMClient.getInstance().groupManager().acceptInvitation(groupId, inviter);
@@ -42,7 +42,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onRequestToJoinReceived(String groupId, String groupName, String applicant, String reason) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         //目前来讲，自动同意加群申请
         try {
             EMClient.getInstance().groupManager().acceptApplication(applicant, groupId);
@@ -57,7 +57,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onRequestToJoinAccepted(String groupId, String groupName, String accepter) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         EventBus.getDefault().post(new GroupChangeEvent());
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
@@ -67,7 +67,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onRequestToJoinDeclined(String groupId, String groupName, String decliner, String reason) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onRequestToJoinDeclined(groupId, groupName, decliner,reason);
@@ -76,7 +76,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onInvitationAccepted(String groupId, String invitee, String reason) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onInvitationAccepted(groupId, invitee, reason);
@@ -85,7 +85,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onInvitationDeclined(String groupId, String invitee, String reason) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onInvitationDeclined(groupId, invitee, reason);
@@ -94,7 +94,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onUserRemoved(String groupId, String groupName) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         EventBus.getDefault().post(new GroupChangeEvent());
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
@@ -104,7 +104,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onGroupDestroyed(String groupId, String groupName) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         EventBus.getDefault().post(new GroupChangeEvent());
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
@@ -114,7 +114,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onAutoAcceptInvitationFromGroup(String groupId, String inviter, String inviteMessage) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onAutoAcceptInvitationFromGroup(groupId, inviter, inviteMessage);
@@ -123,7 +123,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onMuteListAdded(String groupId, List<String> mutes, long muteExpire) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onMuteListAdded(groupId, mutes, muteExpire);
@@ -132,7 +132,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onMuteListRemoved(String groupId, List<String> mutes) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onMuteListRemoved(groupId, mutes);
@@ -141,7 +141,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onAdminAdded(String groupId, String administrator) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onAdminAdded(groupId, administrator);
@@ -150,7 +150,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onAdminRemoved(String groupId, String administrator) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onAdminRemoved(groupId, administrator);
@@ -159,7 +159,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onOwnerChanged(String groupId, String newOwner, String oldOwner) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onOwnerChanged(groupId, newOwner, oldOwner);
@@ -168,7 +168,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onMemberJoined(String groupId, String member) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onMemberJoined(groupId, member);
@@ -177,7 +177,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onMemberExited(String groupId, String member) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onMemberExited(groupId, member);
@@ -186,7 +186,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onAnnouncementChanged(String groupId, String announcement) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onAnnouncementChanged(groupId, announcement);
@@ -195,7 +195,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onSharedFileAdded(String groupId, EMMucSharedFile sharedFile) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onSharedFileAdded(groupId, sharedFile);
@@ -204,7 +204,7 @@ public class GroupChangeListener implements EMGroupChangeListener {
 
     @Override
     public void onSharedFileDeleted(String groupId, String fileId) {
-        KLog.i("groupId = " + groupId);
+        LogPrint.i("groupId = " + groupId);
         for (BaseGroupChangeListener emGroupChangeListener : listeners) {
             if (!TextUtils.equals(emGroupChangeListener.getGroupId(),groupId)) continue;
             emGroupChangeListener.onSharedFileDeleted(groupId, fileId);
